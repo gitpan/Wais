@@ -4,21 +4,12 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Thu Aug 15 18:47:58 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Feb  6 14:17:42 1997
+# Last Modified On: Fri Feb 14 14:04:27 1997
 # Language        : CPerl
-# Update Count    : 21
+# Update Count    : 22
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
-# 
-# $Locker:  $
-# $Log: stem.t,v $
-# Revision 2.2  1997/02/13 12:25:52  pfeifer
-# Ready for next release
-#
-# Revision 2.1  1997/02/06 09:38:57  pfeifer
-# Fogott
-#
 # 
 
 BEGIN { $| = 1; print "1..19\n"; }

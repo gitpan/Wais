@@ -1,21 +1,30 @@
 ChangeLog
 HTWAIS.c
 HTWAIS.h
+INSTALL                      Generated from INSTALL.pod
 MANIFEST
 Makefile.PL
-README
+README                       Generated from Wais.pm
+Wais.pm
 Wais.pod                     Some documentation for the curious.
 Wais.xs
+Wais.h                       Wrapper around wais.h
+Wais/Dict.pm
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
 inspect.PL                   Example script for exploring wais databases.
-Wais.pm
-Wais/Dict.pm
-mkinc
+mkinc                        Script to generate wais.h
 patchlevel.h
+t/a_preop.t                  Index test database, start server
 t/basic.t
 t/dict.t
 t/ndict.t
+t/parallel.t
 t/parallel.t                 Test for the new interface.
 t/stem.t
+t/z_postop.t                 kill server, remove test database
+test/TEST
+test/TEST.german
+test/test.fmt
+test/testg.fmt
 typemap

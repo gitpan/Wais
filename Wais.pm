@@ -4,9 +4,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Feb 13 13:17:12 1997
+# Last Modified On: Fri Feb 14 16:36:18 1997
 # Language        : Perl
-# Update Count    : 155
+# Update Count    : 160
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -23,7 +23,7 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-$VERSION = '2.203';
+$VERSION = '2.300';
 bootstrap Wais $VERSION;
 
 use IO::Socket;
@@ -179,7 +179,7 @@ sub Retrieve {
     }
   } else {
     $fh = new IO::Socket::INET(PeerAddr => $host,
-                               PeerPort => 210,
+                               PeerPort => $port,
                                Proto    => 'tcp',
                                Type     => SOCK_STREAM);
     croak "Could not connect to $host:$port" unless $fh;

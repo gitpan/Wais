@@ -5,41 +5,12 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Feb  6 13:46:36 1997
+# Last Modified On: Fri Feb 14 16:08:43 1997
 # Language        : Perl
-# Update Count    : 109
+# Update Count    : 110
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
-# 
-# $Locker:  $
-# $Log: Dict.pm,v $
-# Revision 2.4  1997/02/13 12:25:52  pfeifer
-# Ready for next release
-#
-# Revision 2.3  1997/02/06 09:31:11  pfeifer
-# Switched to CVS
-#
-# Revision 2.1.1.5  1996/08/08 07:12:13  pfeifer
-# patch15: Fixed little endian problem.
-#
-# Revision 2.1.1.4  1996/08/01 18:11:58  pfeifer
-# patch14: Some fixes to make 'perl -w' happy.
-#
-# Revision 2.1.1.3  1996/07/22 15:40:54  pfeifer
-# patch13:
-# patch13: Fix from Norbert Goevert.
-#
-# Revision 2.1.1.2  1996/07/16 16:39:34  pfeifer
-# patch10: Fixe a bug nin  binsearch. Thanks to Norbert Goevert!
-#
-# Revision 2.1.1.1  1996/04/30 07:46:45  pfeifer
-# patch9: Code wich allows to tie a WAIS dictionary to a hash. Used in
-# patch9: inspect.
-#
-# Revision 1.1  1996/04/23 08:24:15  pfeifer
-# Initial revision
-#
 # 
 
 package Wais::Dict;

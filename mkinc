@@ -8,25 +8,12 @@ eval 'exec perl  -S $0 "$@"'
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Jun 12 12:15:39 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon Jul  1 17:00:43 1996
+# Last Modified On: Fri Feb 14 15:59:59 1997
 # Language        : CPerl
-# Update Count    : 30
+# Update Count    : 32
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
-# 
-# $Locker:  $
-# $Log: mkinc,v $
-# Revision 2.3  1997/02/06 09:31:08  pfeifer
-# Switched to CVS
-#
-# Revision 2.2  1996/08/19 17:15:20  pfeifer
-# perl5.003
-#
-# Revision 2.1.1.1  1996/07/16 16:40:25  pfeifer
-# patch10: Script for building wais.h from the freeWAIS-sf source
-# patch10: directory.
-#
 # 
 
 use FileHandle;
@@ -60,7 +47,6 @@ my $cwd = getcwd;
 for (@ARGV) {
   my ($name,$path) = fileparse($_);
   chdir($path) or "Dir could not chdir to $path: $!\n";
-  #print STDERR "processing ($name,$path)\n";
   do_file($name);
   chdir($cwd);
 }

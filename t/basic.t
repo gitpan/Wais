@@ -5,8 +5,8 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Jun  7 17:45:45 1994
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon May  6 09:09:32 1996
-# Update Count    : 147
+# Last Modified On: Fri Feb 14 14:41:35 1997
+# Update Count    : 151
 # Status          : Unknown, Use with caution!
 # 
 # 
@@ -14,6 +14,10 @@
 # 
 # $Locker:  $
 # $Log: basic.t,v $
+# Revision 2.4  1997/02/14 15:02:45  pfeifer
+# Test do not call remote servers now. People behind firewalls will see
+# all test succeed now - hopefully.
+#
 # Revision 2.3  1997/02/06 09:31:12  pfeifer
 # Switched to CVS
 #
@@ -40,22 +44,11 @@
 # patch6: Test the local database in the freeWAIS-sf soyrce directories.
 #
 # 
-
+BEGIN {print "1..4\n";}
 use Wais;
 
-open(MF, "Makefile") || die "could not open Makefile: $!";
-while (<MF>) {
-    if (/TESTDB => (\'|q\[)(.*)(\'|\])/) {
-        $db = $2;
-        last;
-    } elsif (m/^TESTDB\s*=\s*(\S+)\s*$/) {
-        $db = $1;
-        last;
-    }
-}
-close(MF);
-die "Which db?" unless $db;
-print "1..4\n";
+my $db = 'test/test';
+
 $query    = 'au=(fuhr and pfeifer)';
 $ti       = 'Probabilistic  Learning Approaches for Indexing and Retrieval';
 $lines    = 0;
@@ -76,15 +69,15 @@ print (($#docs == 6)?"ok 1\n" : "not ok 1\n");
 ($text,$diag) = &Wais::retrieve($db, $docid);
 print (($text =~ /$ti/)?"ok 2\n" : "not ok 2\n");
 
-$host     = 'ls6-www.informatik.uni-dortmund.de';
-$port     = 210;
-$db       = 'demo';
-$query    = 'general au=white';
+$host     = 'localhost';
+$port     = 4171;
+$db       = 'test';
+$query    = 'au=pennekamp';
 ($headl, $diag) = &Wais::search($db, $query, $host,$port);
 @docs = split($WAISrecsep, $headl);
-print (($#docs == 1)?"ok 3\n" : "not ok 3\n");
+print (($#docs == 0)?"ok 3\n" : "not ok 3\n");
 
-$ti = 'Technology growth has produced';
+$ti = 'Incremental Processing of Vague Queries';
 ($score,$lines,$docid,$headline) = split(/$WAISfldsep/,pop @docs);
 ($text,$diag) = &Wais::retrieve($db, $docid, $host,$port);
 print (($text =~ /$ti/)?"ok 4\n" : "not ok 4\n$text\n");

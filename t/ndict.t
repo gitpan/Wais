@@ -1,29 +1,17 @@
-#!./perl
 #                              -*- Mode: Perl -*- 
 # ndict.t -- 
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Sep 19 16:15:06 1996
+# Last Modified On: Fri Feb 14 14:04:11 1997
 # Language        : Perl
-# Update Count    : 97
+# Update Count    : 98
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker:  $
-# $Log: ndict.t,v $
-# Revision 2.3  1997/02/06 09:31:13  pfeifer
-# Switched to CVS
-#
-# Revision 2.2  1996/08/19 17:15:20  pfeifer
-# perl5.003
-#
-# Revision 2.1.1.1  1996/08/01 18:12:51  pfeifer
-# patch14: Need harder tests here for binsearch().
-#
-# 
+
 BEGIN {
   print "1..15\n";
   require Wais;
@@ -32,19 +20,7 @@ BEGIN {
   print "ok 2\n";
 }
 
-open(MF, "Makefile") || die "could not open Makefile: $!";
-while (<MF>) {
-    if (/TESTDB => (\'|q\[)(.*)(\'|\])/) {
-        $db = $2;
-        last;
-    } elsif (m/^TESTDB\s*=\s*(\S+)\s*$/) {
-        $db = $1;
-        last;
-    }
-}
-close(MF);
-die "Which db?" unless $db;
-
+$db = 'test/test';
 $au = tie %au, Wais::Dict, "${db}_field_au";
 
 print "ok 3\n";

@@ -1,15 +1,17 @@
+#!/app/unido-i06/magic/perl
 #                              -*- Mode: Perl -*- 
-# Wais.pm -- 
-# ITIID           : $ITI$ $Header $__Header$
+# $Basename: Wais.pm $
+# $Revision: 1.4 $
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu May  1 11:00:46 1997
+# Last Modified On: Tue May 13 09:26:34 1997
 # Language        : Perl
-# Update Count    : 161
+# Update Count    : 163
 # Status          : Unknown, Use with caution!
 # 
-# (C) Copyright 1995, Universität Dortmund, all rights reserved.
+# (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
+# 
 # 
 
 package Wais;
@@ -23,8 +25,8 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion: 23 $/10 + $ProjectMinorVersion: 2 $/1000;"
-$VERSION = sprintf '%5.3f', 23/10 + 1/1000;
+# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion$/10 + $ProjectMinorVersion$/1000;"$
+$VERSION = sprintf '%5.3f', 23/10 + 4/1000;
 
 bootstrap Wais $VERSION;
 

@@ -24,7 +24,6 @@ DESCRIPTION
     dictionary
               A bunch of XS functions useful for inspecting local databases.
 
-
     We will start with the SFgate 5.0 functions.
 
 USAGE
@@ -99,7 +98,6 @@ USAGE
 
               message                  A textual diagnostic message.
 
-
     header              Returns and array of WAIS document headers. Each element
                         (if any) is a reference to an array consisting of
 
@@ -121,9 +119,7 @@ USAGE
               docid                    A reference to the WAIS identifier
                                        blessed into `Wais::Docid'.
 
-
     text                Returns the text fetched by `Wais::Retrieve'.
-
 
 Dictionary
               There are a couple of functions to inspect local databases.
@@ -245,7 +241,6 @@ Protocol
     text      Returns the chunk of the document requested. For documents larger
               than $Wais::CHARS_PER_PAGE more than one request must be send.
 
-
   Wais::Search::DESTROY
 
     The objects will be destroyed by Perl.
@@ -276,7 +271,6 @@ VARIABLES
     $Wais::maxnumfd
               Maximum number of file descriptors to use simultaneously in
               `Wais::Search'. Defaults to `10'.
-
 
 Access to the basic freeWAIS-sf reduction functions
     Wais::Type::stemmer(*word*)

@@ -1,53 +1,17 @@
 /*                               -*- Mode: C -*- 
- * 
- * * HTWAIS.c -- 
- * ITIID           : $ITI$ $Header $__Header$
+ * $Basename: HTWAIS.c $
+ * $Revision: 1.2 $
  * Author          : Brewster Kahle, Thinking Machines, <Brewster@think.com>
  * Created On      : Wed Jun 15 17:07:41 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Nov 26 13:37:45 1996
+ * Last Modified On: Tue May 13 09:22:17 1997
  * Language        : C
- * Update Count    : 214
+ * Update Count    : 215
  * Status          : Unknown, Use with caution!
  * 
- * (C) Copyright 1995, Universität Dortmund, all rights reserved.
+ * (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
  * 
- * HISTORY
- * 
- * $Locker:  $
- * $Log: HTWAIS.c,v $
- * Revision 2.3  1997/02/06 09:34:43  pfeifer
- * Switched to CVS
- *
- * Revision 2.2  1996/08/19 17:15:20  pfeifer
- * perl5.003
- *
- * Revision 2.1.1.1  1996/07/16 16:32:39  pfeifer
- * patch10: Modified for building from installed freeWAIS-sf libraries
- * patch10: and include files.
- *
- * Revision 2.1  1995/12/13  14:53:08  pfeifer
- * *** empty log message ***
- *
- * Revision 2.0.1.4  1995/11/10  16:24:29  pfeifer
- * patch10: Replaced magic variables. By real Variables.
- *
- * Revision 2.0.1.3  1995/11/10  14:52:04  pfeifer
- * patch9: Moved extern definitions to HTWAIS.h. Include HTWAIS.h and
- * patch9: dictionary.h.
- *
- * Revision 2.0.1.2  1995/09/10  09:59:00  pfeifer
- * patch2: Passed trough gnu indent.
- *
- * Revision 2.0.1.2  1995/09/10  09:59:00  pfeifer
- * patch2: Passed trough gnu indent.
- *
- * Revision 2.0.1.1  1995/09/10  09:36:21  pfeifer
- * patch1: Fixed include statements to work for freeWAIS-sf-2.0.
- * patch1: Ok with cc now.
- *
  */
-
 
 #define BIG 10000
 

@@ -1,22 +1,24 @@
+#!/app/unido-i06/magic/perl
 #                              -*- Mode: Perl -*- 
-# Makefile.PL -- 
-# ITIID           : $ITI$ $Header $__Header$
+# $Basename: Makefile.PL $
+# $Revision: 1.3 $
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu May  1 14:33:27 1997
+# Last Modified On: Tue May 13 09:30:18 1997
 # Language        : Perl
-# Update Count    : 228
+# Update Count    : 232
 # Status          : Unknown, Use with caution!
 # 
-# (C) Copyright 1995, Universität Dortmund, all rights reserved.
+# (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
+# 
 # 
 
 use ExtUtils::MakeMaker;
 use Config;
 
-# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion: 23 $/10 + $ProjectMinorVersion: 2 $/1000;"
-$VERSION = sprintf '%5.3f', 23/10 + 1/1000;
+# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion: 23 $/10 + $ProjectMinorVersion: 3 $/1000;"$
+$VERSION = sprintf '%5.3f', 23/10 + 4/1000;
 
 for (qw(waisserver waisindex)) {
   die "Could not find '$_' in your PATH\n"
@@ -25,7 +27,7 @@ for (qw(waisserver waisindex)) {
 
 my $PREOP = qq(
                pod2text INSTALL.pod > INSTALL;
-               pod2text Wais.pm     > README;
+               pod2text Wais.pod    > README;
               );
 $PREOP =~ s/\s+/ /g;
 

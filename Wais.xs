@@ -1,73 +1,16 @@
 /*                               -*- Mode: C -*- 
- * Wais.xs -- 
- * ITIID           : $ITI$ $Header $__Header$
+ * $Basename: Wais.xs $
+ * $Revision: 1.2 $
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu Oct 17 15:41:28 1996
+ * Last Modified On: Tue May 13 09:21:21 1997
  * Language        : C
- * Update Count    : 394
+ * Update Count    : 395
  * Status          : Unknown, Use with caution!
  * 
- * (C) Copyright 1995, Universität Dortmund, all rights reserved.
+ * (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
  * 
- * $Locker:  $
- * $Log: Wais.xs,v $
- * Revision 2.3  1997/02/06 09:31:03  pfeifer
- * Switched to CVS
- *
- * Revision 2.2  1996/08/19 17:15:20  pfeifer
- * perl5.003
- *
- * Revision 2.1.1.11  1996/08/19 15:31:38  pfeifer
- * patch16: Fixed call for setemming stuff.
- *
- * Revision 2.1.1.10  1996/07/22 15:40:20  pfeifer
- * patch13: Added HAS_GUNDFORM.
- *
- * Revision 2.1.1.9  1996/07/16 16:38:15  pfeifer
- * patch10: Modified for building from installed freeWAIS-sf libraries
- * patch10: and include files.
- * patch10: Added support for stemming/sunodex/phonix.
- *
- * Revision 2.1.1.8  1996/04/30 07:40:51  pfeifer
- * patch9: Moved defined clash fixes to dictionary.h.
- * patch9: This is not too clean - but dictionary.h is included
- * patch9: in all C-Files.
- *
- * Revision 2.1.1.7  1996/04/09 13:06:39  pfeifer
- * patch8: Avoid some redifinition warnings.
- *
- * Revision 2.1.1.6  1996/04/09 06:55:36  pfeifer
- * patch7: Fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin).
- *
- * Revision 2.1.1.5  1996/03/07 10:55:23  pfeifer
- * patch7: Made Wais::Search::diagnostics ignore
- * patch7: D_PresentRequestOutOfRange complaints.
- *
- * Revision 2.1.1.4  1996/02/27 18:42:41  pfeifer
- * patch5: Added some tabs for old xsubpp's.
- *
- * Revision 2.1.1.3  1996/02/23 15:45:38  pfeifer
- * patch4: Rewrote Wais::Docid::new. Added Wais::Docid::split.
- *
- * Revision 2.1.1.2  1996/02/05 12:42:35  pfeifer
- * patch2: Fixed some parameter declarations which confused older xsupps.
- *
- * Revision 2.1.1.1  1995/12/28 16:30:29  pfeifer
- * patch1: Support for docids.  Support for init messages. Renamed
- * patch1: database to database_name since some compilers are worried
- * patch1: about types a variables having the same name.
- *
- * Revision 2.1  1995/12/13  14:52:34  pfeifer
- * *** empty log message ***
- *
- * Revision 2.0.1.14  1995/12/13  08:41:07  pfeifer
- * patch14: Added CHARS_PER_PAGE.
- *
- * Revision 2.0.1.13  1995/12/12  11:46:25  pfeifer
- * patch13: Parallel search works.
- *
  */
 
 #ifdef __cplusplus

@@ -1,15 +1,15 @@
 /*                               -*- Mode: C -*- 
- * dictionary.c -- 
- * ITIID           : $ITI$ $Header $__Header$
+ * $Basename: dictionary.c $
+ * $Revision: 1.4 $
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu May  1 14:39:34 1997
+ * Last Modified On: Tue May 13 09:25:48 1997
  * Language        : C
- * Update Count    : 240
+ * Update Count    : 244
  * Status          : Unknown, Use with caution!
  * 
- * (C) Copyright 1995, Universität Dortmund, all rights reserved.
+ * (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
  * 
  */
 
@@ -30,7 +30,7 @@
 #include "dictionary.h"
 
 #ifdef WAIS_USES_STDIO
-#include <stdio.h>
+/* #include <stdio.h> */
 #ifdef fseek
 #undef fseek
 #endif
@@ -173,14 +173,14 @@ find_word (database_name, field, word, offset, matches)
 
 #define W_ERROR(M,V) \
 {\
-        char           buf[80];\
+        char           buff[80];\
         SV             *error = perl_get_sv ("Wais::errmsg", TRUE);\
 \
         if (db) disposeDatabase (db);\
         s_free(index_block_header);\
         s_free (posting_list);\
-      sprintf (buf, M, V);\
-        sv_setpv (error, buf);\
+        sprintf (buff, M, V);\
+        sv_setpv (error, buff);\
         return (0);\
 }
 
@@ -405,12 +405,10 @@ headline(database_name, docid)
 #undef  W_ERROR
 #define W_ERROR(M,V) \
 {\
-        char           buff[80];\
         SV             *error = perl_get_sv ("Wais::errmsg", TRUE);\
 \
         if (db) disposeDatabase (db);\
         if (input_stream != NULL) s_fclose(input_stream);\
-        if (buf != NULL)  s_free (buf);\
         return (0);\
 }
 

@@ -18,6 +18,7 @@
 # patch14: Need harder tests here for binsearch().
 #
 # 
+use lib '.';
 BEGIN {
   print "1..15\n";
   require Wais;

@@ -15,6 +15,7 @@
 # $Log$
 # 
 
+use lib '.';
 BEGIN { $| = 1; print "1..19\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Wais;

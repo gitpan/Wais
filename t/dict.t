@@ -64,6 +64,7 @@ while (<MF>) {
 close(MF);
 die "Which db?" unless $db;
 
+use lib '.';
 use Wais;
 
 $should = 'pollmann,1,poersch,2,pfeifer,10,pennekamp,1,p622,2,p525,1,p455,1,p116,10';

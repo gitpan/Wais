@@ -54,7 +54,7 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-$Wais::VERSION = 2.116;
+$Wais::VERSION = 2.117;
 bootstrap Wais $VERSION;
 require 'chat2.pl';
 

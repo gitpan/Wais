@@ -34,7 +34,7 @@
 # patch6: Test the local database in the freeWAIS-sf soyrce directories.
 #
 # 
-
+use lib '.';
 use Wais;
 
 open(MF, "Makefile") || die "could not open Makefile: $!";

@@ -4,7 +4,6 @@ HTWAIS.h
 MANIFEST
 Makefile.PL
 README
-Wais.pm
 Wais.pod                     Some documentation for the curious.
 Wais.xs
 chat2.pl.PL		     Autoextracting chat2.pl replacement.

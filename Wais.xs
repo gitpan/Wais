@@ -4,15 +4,18 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Jul 16 16:12:36 1996
+ * Last Modified On: Mon Jul 22 12:45:57 1996
  * Language        : C
- * Update Count    : 382
+ * Update Count    : 387
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: Wais.xs,v $
+ * Revision 2.1.1.10  1996/07/22 15:40:20  pfeifer
+ * patch13: Added HAS_GUNDFORM.
+ *
  * Revision 2.1.1.9  1996/07/16 16:38:15  pfeifer
  * patch10: Modified for building from installed freeWAIS-sf libraries
  * patch10: and include files.
@@ -71,7 +74,9 @@ extern "C" {
 #include "Wais.h"
 #include "dictionary.h"
 #include "HTWAIS.h"
+#ifdef HAS_GRUNDFORM
 extern char *grundform _AP((char * word));
+#endif
 extern char *stemmer   _AP((char * word));
 #ifdef VERSION
 #undef VERSION
@@ -87,7 +92,7 @@ void
 init_Wais()
 {
   /* This is a hack to allow for embedding in freeWAIS-sf */
-#ifdef DIRNAMELEN               /* freeWAIS-sf >= 2.1.1 */
+#ifndef HAS_GRUNDFORM               /* freeWAIS-sf >= 2.1.1 */
   int my_perl_inited;
 #else
   extern int my_perl_inited;
@@ -854,6 +859,16 @@ stemmer(word)
 char *
 grundform(word)
 	char * word
+CODE:
+{
+#ifdef HAS_GRUNDFORM
+  RETVAL = grundform(word);
+  ST(0) = sv_newmortal();
+  sv_setpv((SV*)ST(0), RETVAL);
+#else
+  croak("Your freeWAIS-sf version does not implement grundform()");
+#endif
+}
 
 char *
 phonix(word)

@@ -15,6 +15,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: Makefile.PL,v $
+# Revision 2.1.1.7  1996/07/22 15:38:13  pfeifer
+# patch13: Added AP prototype to Wais.h
+#
 # Revision 2.1.1.6  1996/07/16 16:35:42  pfeifer
 # patch10: Modified for building from installed freeWAIS-sf libraries
 # patch10: and include files.

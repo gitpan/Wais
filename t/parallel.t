@@ -5,9 +5,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 16:55:05 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri May 24 15:58:17 1996
+# Last Modified On: Mon Jul 22 17:55:30 1996
 # Language        : Perl
-# Update Count    : 74
+# Update Count    : 79
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -41,8 +41,8 @@
 #
 # 
 
+use lib '.';
 use Wais;
-
 open(MF, "Makefile") || die "could not open Makefile: $!";
 while (<MF>) {
     if (/TESTDB => (\'|q\[)(.*)(\'|\])/) {

@@ -5,15 +5,19 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Jul 12 15:42:49 1996
+# Last Modified On: Thu Jul 18 11:44:18 1996
 # Language        : Perl
-# Update Count    : 62
+# Update Count    : 65
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Dict.pm,v $
+# Revision 2.1.1.3  1996/07/22 15:40:54  pfeifer
+# patch13:
+# patch13: Fix from Norbert Goevert.
+#
 # Revision 2.1.1.2  1996/07/16 16:39:34  pfeifer
 # patch10: Fixe a bug nin  binsearch. Thanks to Norbert Goevert!
 #
@@ -31,7 +35,7 @@ use vars qw($VERSION);
 {
   my $Revision = '';
   
-  $VERSION = join '', q$Revision: 2.1.1.2 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+  $VERSION = join '', q$Revision: 2.1.1.3 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
 }
 use Carp;
 use FileHandle;
@@ -183,8 +187,27 @@ sub NEXTKEY {
     my ($term,$ptr, $occ) = unpack 'A21 I I', $buf;
 
     return undef unless $term;  # just paranoid
-    # We save the valu for this term since each() calls NEXTKEY/FETCH
+    # We save the value for this term since each() calls NEXTKEY/FETCH
     # each might get (key,value) with one function call better?
+    $self->{KEY}   = $term;
+    $self->{VALUE} = [$ptr, $occ];
+    return $term;
+}
+
+sub PREVKEY {
+    my $self = shift;
+    my $buf;
+    my $fh   = $self->{FH};
+
+    $self->{FH}->seek(-29,1)         || return undef;
+    $self->{FH}->tell >= $self->{FI} || return undef;
+    read($$fh,$buf,29)               || return undef;
+    $self->{FH}->seek(-29,1)         || return undef;
+
+    my ($term,$ptr, $occ) = unpack 'A21 I I', $buf;
+
+    return undef unless $term;  # just paranoid
+    # We save the value for this term for no particular reason.
     $self->{KEY}   = $term;
     $self->{VALUE} = [$ptr, $occ];
     return $term;

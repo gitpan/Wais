@@ -4,15 +4,19 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Fri Nov 10 15:35:13 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Apr 30 08:57:17 1996
+ * Last Modified On: Mon Jul  1 17:37:13 1996
  * Language        : C
- * Update Count    : 9
+ * Update Count    : 24
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.h,v $
+ * Revision 2.1.1.3  1996/07/16 16:38:55  pfeifer
+ * patch10: Modified for building from installed freeWAIS-sf libraries
+ * patch10: and include files.
+ *
  * Revision 2.1.1.2  1996/04/30 07:40:55  pfeifer
  * patch9: Moved defined clash fixes to dictionary.h.
  * patch9: This is not too clean - but dictionary.h is included
@@ -35,32 +39,13 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
-#ifdef WORD
-#undef WORD			/* defined in the perl parser */
-#endif
-#ifdef _config_h_
-#undef _config_h_		/* load the freeWAIS-sf config.h also */
-#endif
-#ifdef warn
-#undef warn
-#endif
-#ifdef Strerror
-#undef Strerror
-#endif
+#include "Wais.h"
 
-#include "cutil.h"
-#include "irfiles.h"
-#include "irtfiles.h"		/* for map_over_words */
-#include "irext.h"
-#include "irsearch.h"
-#include "weight.h"
+extern int find_word        _AP((char *database_name, char *field_name, 
+                                 char *word, long offset, long *matches));
+extern int postings         _AP((char *database_name, char *field_name, 
+                                 char *word, long *number_of_postings));
+extern char *headline       _AP((char *database_name, long docid));
+extern char *document       _AP((char *database_name, long docid));
 
-extern int find_partialword _AP((database *db, char *field_name, char *word, 
-                               long offset, long *matches));
-extern int find_word _AP((char *database_name, char *field_name, char *word, 
-                               long offset, long *matches));
-extern int postings _AP((char *database_name, char *field_name, char *word, 
-                       long *number_of_postings));
-extern char *headline _AP((char *database_name, long docid));
-extern char *document _AP((char *database_name, long docid));
 #endif

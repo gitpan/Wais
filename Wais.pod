@@ -4,15 +4,18 @@
 ## Author          : Ulrich Pfeifer
 ## Created On      : Wed Dec 13 12:26:05 1995
 ## Last Modified By: Ulrich Pfeifer
-## Last Modified On: Fri Mar  8 20:35:37 1996
+## Last Modified On: Mon Jul  1 18:01:20 1996
 ## Language        : Pod
-## Update Count    : 48
+## Update Count    : 49
 ## Status          : Unknown, Use with caution!
 ## 
 ## (C) Copyright 1995, Universität Dortmund, all rights reserved.
 ## 
 ## $Locker: pfeifer $
 ## $Log: Wais.pod,v $
+## Revision 2.1.1.4  1996/07/16 16:37:35  pfeifer
+## patch10: Fixed some typos. New functions are not yet documented.
+##
 ## Revision 2.1.1.3  1996/02/23 15:45:18  pfeifer
 ## patch4: Documented Wais::Docid::new and Wais::Docid::split.
 ##
@@ -108,8 +111,6 @@ database/host/port triple. If omitted defaults to the database name.
 
 If present must be a reference to an array containing alternating
 document id's and types. Document id's must be of type C<Wais:Docid>.
-
-=back
 
 Here is a complete example:
 

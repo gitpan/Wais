@@ -5,8 +5,8 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Jun  7 17:45:45 1994
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Sun Apr 21 12:23:00 1996
-# Update Count    : 146
+# Last Modified On: Mon May  6 09:09:32 1996
+# Update Count    : 147
 # Status          : Unknown, Use with caution!
 # 
 # 
@@ -14,6 +14,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: basic.t,v $
+# Revision 2.1.1.3  1996/07/16 16:40:41  pfeifer
+# patch10:
+#
 # Revision 2.1.1.2  1996/04/09 13:06:56  pfeifer
 # patch8: More robust tests.
 #
@@ -78,5 +81,5 @@ print (($#docs == 1)?"ok 3\n" : "not ok 3\n");
 $ti = 'Technology growth has produced';
 ($score,$lines,$docid,$headline) = split(/$WAISfldsep/,pop @docs);
 ($text,$diag) = &Wais::retrieve($db, $docid, $host,$port);
-print (($text =~ /$ti/)?"ok 4\n" : "not ok 4\n");
+print (($text =~ /$ti/)?"ok 4\n" : "not ok 4\n$text\n");
 

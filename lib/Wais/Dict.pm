@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Tue Apr 30 09:37:13 1996
+# Last Modified On: Fri Jul 12 15:42:49 1996
 # Language        : Perl
-# Update Count    : 57
+# Update Count    : 62
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Dict.pm,v $
+# Revision 2.1.1.2  1996/07/16 16:39:34  pfeifer
+# patch10: Fixe a bug nin  binsearch. Thanks to Norbert Goevert!
+#
 # Revision 2.1.1.1  1996/04/30 07:46:45  pfeifer
 # patch9: Code wich allows to tie a WAIS dictionary to a hash. Used in
 # patch9: inspect.
@@ -28,7 +31,7 @@ use vars qw($VERSION);
 {
   my $Revision = '';
   
-  $VERSION = join '', '$Revision: 2.1.1.1 $ ' =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+  $VERSION = join '', q$Revision: 2.1.1.2 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
 }
 use Carp;
 use FileHandle;
@@ -130,7 +133,9 @@ sub binsearch {
         if ($term eq $fterm) {  # hit
             return [$ptr, $occ] ;
         } else {
-            return undef;       # no found
+          my $cmp = &cmp($term, $fterm);
+          $fh->seek(-29,1) if $cmp < 0;
+          return undef;       # no found
         }
     } else {                    # partition intervall
         my $mid = $left + int(($right-$left)/2/29)*29;
@@ -215,7 +220,7 @@ sub SET {
     my $found; 
 
     $found = $self->FETCH($term);
-    if ($found =~ /$term/) {    # wanna see that again!
+    if ($found) {    # wanna see that again!
         $self->{FH}->seek(-29,1);
     }
     1;

@@ -4,15 +4,19 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Fri Nov 10 15:41:36 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Apr  9 14:01:54 1996
+ * Last Modified On: Thu Jun 13 16:30:32 1996
  * Language        : C
- * Update Count    : 3
+ * Update Count    : 5
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: HTWAIS.h,v $
+ * Revision 2.1.1.2  1996/07/16 16:32:46  pfeifer
+ * patch10: Modified for building from installed freeWAIS-sf libraries
+ * patch10: and include files.
+ *
  * Revision 2.1.1.1  1996/04/09 13:05:43  pfeifer
  * patch8: Avoid some redifinition warnings.
  *
@@ -25,20 +29,7 @@
  */
 
 #ifndef HTWAIS_H
-#define HTWAIS_H
-#ifdef WORD
-#undef WORD			/* defined in the perl parser */
-#endif
-#ifdef _config_h_
-#undef _config_h_		/* load the freeWAIS-sf config.h also */
-#endif
-#ifdef warn
-#undef warn
-#endif
-#ifdef Strerror
-#undef Strerror
-#endif
-#include <ui.h>
+#include "Wais.h"
 extern int WAISsearch _AP((char *host, int port, char *database, char *keywords,
                               SV *diag, SV *headl, SV *text));
 

@@ -1,14 +1,91 @@
 For installation you need a installed perl5. I used perl5.001n and
 perl5.002.  Also you need the freeWAIS-sf-2.0 distribution with
-patchlevel >= 46. For compilation the source directory of freeWAIS-sf
-is used.  For the tests the test database in the freeWAIS-sf source
-directory is used. So recreate it if you cleaned there.
+patchlevel >= 46. 
 
-Untar the waisperl tarfile outside the perl source tree.  Then, you
-have to edit Makefile.PL and customize it with the name of your
-freeWAIS-sf source directory. 'perl Makefile.PL' will ask you for the
-directory if you did not do that. (Hopefully, you didn't blow the
-latter away after compiling freeWAIS-sf. :))
+There are two ways to build this extension:
+
+        1) Using the freeWAIS-sf source directory
+        2) Using the installed libraries
+
+Untar the waisperl tarfile outside the perl source tree.
+
+1) Building using the freeWAIS-sf source directory
+==================================================
+
+For compilation the source directory of freeWAIS-sf is used.  For the
+tests the test database in the freeWAIS-sf source directory is
+used. So recreate it if you cleaned there.
+
+Edit Makefile.PL and customize it with the name of your freeWAIS-sf
+source directory. 'perl Makefile.PL' will ask you for the directory if
+you did not do that. (Hopefully, you didn't blow the latter away after
+compiling freeWAIS-sf. :))
+
+2) Building using the installed libraries
+=========================================
+
+Currently no pubic version of freeWAIS-sf installes all the needed
+library and include files. So there is some work to do before you
+start.  But installation from the installed linbrary allowes you to
+remove the freeWAIS-sf source tree from you hard disk. You should keep
+your test database (from the FIELD-EXAMPLE subdirectory) arround if
+you want ot run the tests. The sources and format files should fit
+into 10k bytes ;-)
+
+This version of the WAIS extension comes with a script which you
+should use to generate a 'wais.h' include file in the 'ir'
+subdirectory of the freeWAIS-sf source tree:
+
+ ,-----
+ | mkinc -I../ctype ui.h cutil.h irext.h irfiles.h irsearch.h \
+ |         irtfiles.h weight.h docid.h > wais.h
+ `-----
+
+Do not use '-I../ctype' if you did use your systems ctypes when
+compiling freeWAIS-sf. Generally you can use the same flags as you did
+when compiling the sources of freeWAIS-sf. Only '-I' flags are used.
+
+If you want to use this alternative, make sure that the compiler can
+find the 'wais.h' and the linker can find the freeWAIS-sf libraries.
+
+Here is a complete receipe which works for freeWAIS-sf-2.0.6* and
+freeWAIS-sf-2.1.1:
+
+ ,-----
+ | cd .../freeWAIS-sf-2.1.1/ir
+ | $WAIS/ir/mkinc  -I../ctype -I. ui.h cutil.h irext.h irfiles.h irsearch.h irtfiles.h weight.h docid.h > /tmp/wais.h
+ | cd ..
+ | cp */lib*.a /tmp
+ | ar cq /tmp/libwais.a ctype/ctype.o
+ | ranlib /tmp/libwais.a
+ | ranlib /tmp/libftw.a
+ | ranlib /tmp/libregexp.a
+ `-----
+
+Fix in Makefile.PL:
+ ,-----
+ | [pfeifer@charly:ext/Wais-new]{271} diff Makefile.PL.ls6 Makefile.PL
+ | < $FW      = "/usr/local/ls6/src+data/src/freeWAIS-sf-2.0";
+ | ---
+ | > $FW      = "/usr/local/ls6/src+data/src/freeWAIS-sf-2.1.1";
+ | 71c71,72
+ | < 
+ | ---
+ | > $CFLAGS  = "-I/tmp";
+ | > $LDFLAGS = "-L/tmp";
+ `-----
+
+If you used the freeWAIS-sf ctypes you might get lots of warnings. To
+avoid them, generate an empty ctype.h
+
+ ,-----
+ | touch ctype.h
+ `-----
+
+and add -I. to the CFLAGS.
+
+1,2) After that proceed as you would with most perl extensions.
+===============================================================
 
 Then run 'perl Makefile.PL'. For building a dynamic extension use 
 
@@ -23,8 +100,10 @@ See the documentation of MakeMaker for details. Run
         perldoc ExtUtils::MakeMaker
 
 chat2.pl:
+=========
 
-        The standard chat2.pl does not work on SOLARIS. I have
+        The standard chat2.pl does not work on SOLARIS (If you did not
+        'use Socket.pm' before loading 'caht2.pl'). I have
         included a self-extracting chat2.pl which will serve a
         replacement for the distributions chat2.pl. It uses the socket
         module to set the parameters. On systems on which chat2.pl

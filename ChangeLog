@@ -1,3 +1,18 @@
+Tue Jul 16 18:43:51 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch10:
+
+	Modified for building from installed freeWAIS-sf libraries
+	and include files. Added info how to build wais.h
+
+Wais.xs
+	Added support for stemming/soundex/phonix. New functions are
+        not yet documented.
+
+lib/Wais/Dict.pm
+	Fixed a bug in  binsearch. Thanks to Norbert Goevert!
+
+
 Tue Apr 30 09:52:52 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 Description patch #9:

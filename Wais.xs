@@ -4,15 +4,20 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Apr 30 09:04:44 1996
+ * Last Modified On: Tue Jul 16 16:12:36 1996
  * Language        : C
- * Update Count    : 365
+ * Update Count    : 382
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: Wais.xs,v $
+ * Revision 2.1.1.9  1996/07/16 16:38:15  pfeifer
+ * patch10: Modified for building from installed freeWAIS-sf libraries
+ * patch10: and include files.
+ * patch10: Added support for stemming/sunodex/phonix.
+ *
  * Revision 2.1.1.8  1996/04/30 07:40:51  pfeifer
  * patch9: Moved defined clash fixes to dictionary.h.
  * patch9: This is not too clean - but dictionary.h is included
@@ -63,10 +68,11 @@ extern "C" {
 }
 #endif
 
+#include "Wais.h"
 #include "dictionary.h"
 #include "HTWAIS.h"
-#include <docid.h>
-
+extern char *grundform _AP((char * word));
+extern char *stemmer   _AP((char * word));
 #ifdef VERSION
 #undef VERSION
 #endif
@@ -80,6 +86,12 @@ static STRLEN  p_stl;
 void
 init_Wais()
 {
+  /* This is a hack to allow for embedding in freeWAIS-sf */
+#ifdef DIRNAMELEN               /* freeWAIS-sf >= 2.1.1 */
+  int my_perl_inited;
+#else
+  extern int my_perl_inited;
+#endif
   char            buf[80];
   SV             *version = perl_get_sv("Wais::VERSION", TRUE);
   SV             *recsep  = perl_get_sv("Wais::recsep", TRUE);
@@ -98,6 +110,7 @@ init_Wais()
   sv_setiv(maxdoc, WAISmaxdoc);
   sv_setiv(cpp, CHARS_PER_PAGE);
   Wais_inited = 1;
+  my_perl_inited = 1;           /* do not start new interpreter for stemming */
 }
                 
 MODULE = Wais PACKAGE = Wais
@@ -387,7 +400,7 @@ CODE:
       if (docobjs == NULL)
 	croak("Out of memory");
       for (i = 0; i < length; i++) {
-	any             DocID;
+	any             docid;
 	char           *itype;
 
 	SV            **this = av_fetch(darr, 2 * i, 0);
@@ -395,12 +408,12 @@ CODE:
 
 	itype = SvPV(*type, na);
 	if (sv_isa(*this, "Wais::Docid")) {
-	  DocID.bytes = SvPV(SvRV(*this), p_stl);
-          DocID.size=p_stl;
+	  docid.bytes = SvPV(SvRV(*this), p_stl);
+          docid.size=p_stl;
 	} else {
 	  croak("Wais::generate_search_apdu: Invalid docid in request");
 	}
-	docobjs[i] = makeDocObjUsingWholeDocument(&DocID, itype);
+	docobjs[i] = makeDocObjUsingWholeDocument(&docid, itype);
       }
       docobjs[length] = NULL;
     } else {
@@ -458,12 +471,12 @@ CODE:
   (char *) s_malloc((size_t) MAX_MESSAGE_LEN * sizeof(char));
   long            i;
   long            chunk = 0;
-  any             DocID;
+  any             docid;
   SV             *cpp = perl_get_sv("Wais::CHARS_PER_PAGE", TRUE);
 
   if (sv_isa(ST(1), "Wais::Docid")) {
-    DocID.bytes = SvPV(SvRV(ST(1)), p_stl);
-    DocID.size=p_stl;
+    docid.bytes = SvPV(SvRV(ST(1)), p_stl);
+    docid.size=p_stl;
   } else {
     croak("Wais::generate_retrieval_apdu: Invalid docid in request");
   }
@@ -479,7 +492,7 @@ CODE:
 
   RETVAL = generate_retrieval_apdu(request_message + HEADER_LENGTH,
 				   &request_buffer_length,
-				   &DocID,
+				   &docid,
 				   CT_byte,
 				   chunk * SvIV(cpp),
 				   (chunk + 1) * SvIV(cpp),
@@ -831,3 +844,38 @@ PPCODE:
     }
   }
 }
+
+MODULE = Wais PACKAGE = Wais::Type
+
+char *
+stemmer(word)
+	char * word
+
+char *
+grundform(word)
+	char * word
+
+char *
+phonix(word)
+	char * word
+CODE:
+{
+    char 	RETVAL[80];
+
+    PhonixCode(word,RETVAL);
+    ST(0) = sv_newmortal();
+    sv_setpv((SV*)ST(0), RETVAL);
+}
+
+char *
+soundex(word)
+	char * word
+CODE:
+{
+    char 	RETVAL[80];
+
+    SoundexCode(word,RETVAL);
+    ST(0) = sv_newmortal();
+    sv_setpv((SV*)ST(0), RETVAL);
+}
+       

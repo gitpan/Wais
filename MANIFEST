@@ -18,4 +18,5 @@ t/basic.t
 t/dict.t
 t/ndict.t
 t/parallel.t                 Test for the new interface.
+t/stem.t
 typemap

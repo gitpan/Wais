@@ -4,15 +4,21 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Mon Jul 22 12:45:57 1996
+ * Last Modified On: Thu Aug 15 19:28:39 1996
  * Language        : C
- * Update Count    : 387
+ * Update Count    : 393
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: Wais.xs,v $
+ * Revision 2.2  1996/08/19 17:15:20  pfeifer
+ * perl5.003
+ *
+ * Revision 2.1.1.11  1996/08/19 15:31:38  pfeifer
+ * patch16: Fixed call for setemming stuff.
+ *
  * Revision 2.1.1.10  1996/07/22 15:40:20  pfeifer
  * patch13: Added HAS_GUNDFORM.
  *
@@ -855,6 +861,15 @@ MODULE = Wais PACKAGE = Wais::Type
 char *
 stemmer(word)
 	char * word
+CODE:
+{
+  char copy[22];
+  strncpy(copy, word,21);
+  copy[21] = '\0';
+  ST(0) = sv_newmortal();
+  stemmer(copy);
+  sv_setpv((SV*)ST(0), copy);
+}
 
 char *
 grundform(word)
@@ -877,7 +892,7 @@ CODE:
 {
     char 	RETVAL[80];
 
-    PhonixCode(word,RETVAL);
+    Phonix(word,RETVAL);
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), RETVAL);
 }
@@ -889,7 +904,7 @@ CODE:
 {
     char 	RETVAL[80];
 
-    SoundexCode(word,RETVAL);
+    Soundex(word,RETVAL);
     ST(0) = sv_newmortal();
     sv_setpv((SV*)ST(0), RETVAL);
 }

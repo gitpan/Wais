@@ -4,15 +4,20 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Wed Dec 13 14:27:12 1995
+ * Last Modified On: Fri Dec 22 13:47:01 1995
  * Language        : C
- * Update Count    : 309
+ * Update Count    : 330
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: Wais.xs,v $
+ * Revision 2.1.1.1  1995/12/28 16:30:29  pfeifer
+ * patch1: Support for docids.  Support for init messages. Renamed
+ * patch1: database to database_name since some compilers are worried
+ * patch1: about types a variables having the same name.
+ *
  * Revision 2.1  1995/12/13  14:52:34  pfeifer
  * *** empty log message ***
  *
@@ -42,6 +47,8 @@ extern "C" {
 #endif
 #include "dictionary.h"
 #include "HTWAIS.h"
+#include <docid.h>
+
 #ifdef VERSION
 #undef VERSION
 #endif
@@ -113,10 +120,10 @@ CODE:
 }
 
 void
-search(database, keywords, host=NULL,port=210)
+search(database_name, keywords, host=NULL,port=210)
 	char *	host
 	int	port
-	char *	database
+	char *	database_name
 	char *	keywords
 PPCODE:
 {
@@ -128,7 +135,7 @@ PPCODE:
   sv_setpv(headl, "");
   sv_setpv(diag, "");
   sv_setpv(text, "");
-  retval = WAISsearch(host, port, database, keywords,
+  retval = WAISsearch(host, port, database_name, keywords,
 		      diag, headl, text);
   EXTEND(sp, 3);
   PUSHs(sv_2mortal(headl));
@@ -137,10 +144,10 @@ PPCODE:
 }
 
 void
-retrieve(database, docid, host=NULL,port=210)
+retrieve(database_name, docid, host=NULL,port=210)
 	char *	host
 	int	port
-	char *	database
+	char *	database_name
 	char *	docid
 PPCODE:
 {
@@ -152,7 +159,7 @@ PPCODE:
   sv_setpv(headl, "");
   sv_setpv(diag, "");
   sv_setpv(text, "");
-  retval = WAISretrieve(host, port, database, docid,
+  retval = WAISretrieve(host, port, database_name, docid,
 			diag, headl, text);
 
   EXTEND(sp, 3);
@@ -162,8 +169,8 @@ PPCODE:
 }
 
 void
-dictionary(database, ...)
-	char *database
+dictionary(database_name, ...)
+	char *database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -189,7 +196,7 @@ PPCODE:
     return;
   }
   stack_sp -= items;		/* find_partialword modifies stack :-( */
-  if (!find_word(database, field, word, offset, &matches)) {
+  if (!find_word(database_name, field, word, offset, &matches)) {
     EXTEND(sp, 1);
     PUSHs(&sv_undef);
   } else if (!(GIMME == G_ARRAY)) {
@@ -203,8 +210,8 @@ PPCODE:
 }
 
 void
-list_offset(database, ...)
-	char *database
+list_offset(database_name, ...)
+	char *database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -230,7 +237,7 @@ PPCODE:
     return;
   }
   stack_sp -= items;		/* find_partialword modifies stack :-( */
-  if (!find_word(database, field, word, offset, &matches)) {
+  if (!find_word(database_name, field, word, offset, &matches)) {
     EXTEND(sp, 1);
     PUSHs(&sv_undef);
   } else if (!(GIMME == G_ARRAY)) {
@@ -244,8 +251,8 @@ PPCODE:
 }
 
 void
-postings(database, ...)
-	char *database
+postings(database_name, ...)
+	char *database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -264,7 +271,7 @@ PPCODE:
     return;
   }
   stack_sp -= items;		/* postings() modifies stack :-( */
-  if (!postings(database, field, word, &number_of_postings)) {
+  if (!postings(database_name, field, word, &number_of_postings)) {
     EXTEND(sp, 1);
     PUSHs(&sv_undef);
   } else if (!(GIMME == G_ARRAY)) {
@@ -278,26 +285,64 @@ PPCODE:
 }
 
 char *
-headline(database,docid)
-	char *	database;
+headline(database_name,docid)
+	char *	database_name;
 	long	docid;
 
 char *
-document(database,docid)
-	char *	database;
+document(database_name,docid)
+	char *	database_name;
 	long	docid;
 CODE:
 {
-  RETVAL = document(database, docid);
+  RETVAL = document(database_name, docid);
   ST(0) = sv_newmortal();
   sv_setpv((SV *) ST(0), RETVAL);
   s_free(RETVAL);
 }
 
 char *
-generate_search_apdu(keywords,database, ...)
+generate_init_apdu()
+CODE:
+{
+  long            request_buffer_length = MAX_MESSAGE_LEN;
+  char           *request_message =
+  (char *) s_malloc((size_t) MAX_MESSAGE_LEN * sizeof(char));
+  InitAPDU       *init = NULL;
+  long            result;
+  char           *userInfo = "perl";
+  init = makeInitAPDU(true, false, false, false, false, request_buffer_length, 
+                      request_buffer_length, userInfo, 
+                      defaultImplementationID(),
+		      defaultImplementationName(),
+		      defaultImplementationVersion(), NULL, userInfo);
+
+  /* write it to the buffer */
+  result = writeInitAPDU(init, request_message + HEADER_LENGTH,
+			 &request_buffer_length) - request_message;
+
+  ST(0) = sv_newmortal();
+  if (result < 0) {
+    SV             *error = perl_get_sv("Wais::errmsg", TRUE);
+
+    sv_setpv(error, "Could not generate request_message");
+  } else {
+    writeWAISPacketHeader(request_message,
+			  MAX_MESSAGE_LEN - request_buffer_length,
+			  (long) 'z',	/* Z39.50 */
+			  "wais      ",		/* server name */
+			  (long) NO_COMPRESSION,	/* no compression */
+			  (long) NO_ENCODING, (long) HEADER_VERSION);
+    sv_setpvn(ST(0), request_message, HEADER_LENGTH +
+	      MAX_MESSAGE_LEN - request_buffer_length);
+  }
+  freeInitAPDU(init);
+}
+
+char *
+generate_search_apdu(keywords,database_name, ...)
 	char *	keywords;
-	char *	database;
+	char *	database_name;
 CODE:
 {
   long            maxDocsRetrieved = SvIV(perl_get_sv("Wais::maxdoc", FALSE));
@@ -308,7 +353,7 @@ CODE:
   long            i;
 
   if (items > 3)
-    croak("Usage: Wais::generate_search_apdu(words,database, ...)");
+    croak("Usage: Wais::generate_search_apdu(words,database_name, ...)");
   if (items == 3) {
     if (SvROK(ST(2)) && (SvTYPE(SvRV(ST(2))) == SVt_PVAV)) {
       AV             *darr = (AV *) SvRV(ST(2));
@@ -345,7 +390,7 @@ CODE:
      interprete_message */
   RETVAL = generate_search_apdu(request_message + HEADER_LENGTH,
 				&request_buffer_length,
-				keywords, database, docobjs,
+				keywords, database_name, docobjs,
 				maxDocsRetrieved);
   if (TRACE)
     fprintf(stderr, "generate_search_apdu-> %ld\n",
@@ -378,8 +423,8 @@ CODE:
 
 
 char *
-generate_retrieval_apdu(database, docid, type, ...)
-	char *	database;
+generate_retrieval_apdu(database_name, docid, type, ...)
+	char *	database_name;
 	char *	docid;
 	char *	type;
 CODE:
@@ -403,7 +448,7 @@ CODE:
     chunk = SvIV(ST(3));
   }
   if (items > 4) {
-    croak("Usage: Wais::generate_retrieval_apdu(database, docid, type, [chunk])");
+    croak("Usage: Wais::generate_retrieval_apdu(database_name, docid, type, [chunk])");
   }
   ST(0) = sv_newmortal();
 
@@ -414,7 +459,7 @@ CODE:
 				   chunk * SvIV(cpp),
 				   (chunk + 1) * SvIV(cpp),
 				   type,
-				   database);
+				   database_name);
 
   if (TRACE)
     fprintf(stderr, "generate_retrieval_apdu-> %ld\n",
@@ -468,6 +513,124 @@ CODE:
   if (response_message)
     free(response_message);
 }
+
+MODULE = Wais PACKAGE = Wais::Init
+
+InitResponseAPDU*
+new(result_message)
+        char *  result_message;
+CODE:
+{
+  RETVAL = NULL;
+
+  if (readInitResponseAPDU(&RETVAL,result_message) == NULL){
+    freeWAISInitResponse((WAISInitResponse*)RETVAL->UserInformationField);
+    freeInitResponseAPDU(RETVAL);
+    ST(0) = &sv_undef;
+    XSRETURN(1);
+  }
+  if (RETVAL->Result == false)
+    {				/* the server declined service */
+      freeWAISInitResponse((WAISInitResponse*)RETVAL->UserInformationField);
+      freeInitResponseAPDU(RETVAL);
+      ST(0) = &sv_undef;
+      XSRETURN(1);
+    }
+  else				/* we got a response back */
+    { /* result = RETVAL->MaximumRecordSize;
+      freeWAISInitResponse((WAISInitResponse*)RETVAL->UserInformationField);
+      freeInitResponseAPDU(RETVAL); */
+    }
+}
+OUTPUT:
+	RETVAL
+
+void
+DESTROY(init_response)
+     InitResponseAPDU*	init_response;
+CODE:
+{
+  if (TRACE)
+    fprintf(stderr, "DESTROY: %lx\n", init_response);
+  if (init_response && init_response != (InitResponseAPDU *) 0xDeadBeef) {
+    freeWAISInitResponse((WAISInitResponse *) init_response->
+			 UserInformationField);
+    freeInitResponseAPDU(init_response);
+  }
+  init_response = (InitResponseAPDU *) 0xDeadBeef;
+}
+OUTPUT:
+	init_response
+
+char *
+ImplementationID(init_response)
+     InitResponseAPDU*	init_response;
+CODE:
+{
+  RETVAL = init_response->ImplementationID;
+}
+OUTPUT:
+	RETVAL
+
+char *
+ImplementationName(init_response)
+     InitResponseAPDU*	init_response;
+CODE:
+{
+  RETVAL = init_response->ImplementationName;
+}
+OUTPUT:
+	RETVAL
+
+char *
+ImplementationVersion(init_response)
+     InitResponseAPDU*	init_response;
+CODE:
+{
+  RETVAL = init_response->ImplementationVersion;
+}
+OUTPUT:
+	RETVAL
+
+MODULE = Wais PACKAGE = Wais::Docid
+
+SV *
+new(type, server, database_name, localid)
+	char *  type;
+	char *	server;
+	char *	database_name;
+	char *	localid;
+CODE:
+{
+  DocID           docID;
+  any             Server;
+  any             Database;
+  any             LocalID;
+  any            *Result;
+  SV             *svdocid = sv_newmortal();
+  HV             *stash = gv_stashpv("Wais::Docid", TRUE);
+
+  Server.bytes = SvPV(ST(1), Server.size);
+  Database.bytes = SvPV(ST(2), Database.size);
+  LocalID.bytes = SvPV(ST(3), LocalID.size);
+
+  docID.originalServer = &Server;
+  docID.distributorServer = &Server;
+  docID.originalDatabase = &Database;
+  docID.distributorDatabase = &Database;
+  docID.originalLocalID = &LocalID;
+  docID.distributorLocalID = &LocalID;
+  docID.copyrightDisposition = COPY_WITHOUT_RESTRICTION;
+
+  Result = anyFromDocID(&docID);
+  sv_setpvn(svdocid, Result->bytes, Result->size);
+  freeAny(Result);
+  RETVAL = newRV(svdocid);
+  (void) sv_bless(RETVAL, stash);
+}
+OUTPUT:
+	RETVAL
+
 
 MODULE = Wais PACKAGE = Wais::Search
 

@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Tue Nov 14 13:51:01 1995
+# Last Modified On: Thu Dec 28 17:24:02 1995
 # Language        : Perl
-# Update Count    : 38
+# Update Count    : 46
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: dict.t,v $
+# Revision 2.1.1.1  1995/12/28 16:32:01  pfeifer
+# patch1:
+#
 # Revision 2.1  1995/12/13  14:53:23  pfeifer
 # *** empty log message ***
 #
@@ -61,6 +64,10 @@ $result =  &Wais::dictionary($db, 'au');
 print (($should == $result)?"ok 4\n" : "not ok 4\n");
 
 %x = &Wais::postings($db, 'au', 'pfeifer');
+#for (keys %x) {
+#    print $_, "\t", join(':', @{$x{$_}}), "\n";
+#}
+print $x{2}->[0], "\n";
 print (($x{2}->[0] == 0.5)?"ok 5\n" : "not ok 5\n");
 
 %x = &Wais::postings($db, 'fuhr');

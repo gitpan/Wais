@@ -4,15 +4,18 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Fri Nov 10 15:35:13 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Nov 14 15:54:20 1995
+ * Last Modified On: Thu Dec 28 16:48:37 1995
  * Language        : C
- * Update Count    : 7
+ * Update Count    : 8
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.h,v $
+ * Revision 2.1.1.1  1995/12/28 16:31:50  pfeifer
+ * patch1:
+ *
  * Revision 2.1  1995/12/13  14:56:31  pfeifer
  * *** empty log message ***
  *

@@ -13,7 +13,7 @@
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
+# $Locker:  $
 # $Log: Makefile.PL,v $
 # Revision 2.1  1995/12/13  14:52:20  pfeifer
 # *** empty log message ***

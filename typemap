@@ -1,6 +1,7 @@
 TYPEMAP
 DocObj **		T_PTROBJ
 SearchResponseAPDU *	T_SRAPDU
+InitResponseAPDU *	T_SRAPDU
 #############################################################################
 INPUT
 T_SRAPDU

@@ -3,16 +3,19 @@
  * ITIID           : $ITI$ $Header $__Header$
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
- * Last Modified By: Testaccount
- * Last Modified On: Mon Dec 11 11:12:25 1995
+ * Last Modified By: Ulrich Pfeifer
+ * Last Modified On: Thu Dec 28 17:30:47 1995
  * Language        : C
- * Update Count    : 179
+ * Update Count    : 193
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.c,v $
+ * Revision 2.1.1.1  1995/12/28 16:31:39  pfeifer
+ * patch1: Casted result of strdup to make sure.
+ *
  * Revision 2.1  1995/12/13  14:56:27  pfeifer
  * *** empty log message ***
  *
@@ -161,7 +164,7 @@ find_word (database_name, field, word, offset, matches)
   database       *db;
 
   if (field != NULL) {
-    fna[0] = strdup (field);
+    fna[0] = (char *)strdup (field);
     if ((db = open_database (database_name, fna, 1)) == NULL) {
       s_free (fna[0]);
       return (0);
@@ -175,7 +178,7 @@ find_word (database_name, field, word, offset, matches)
 
   if (all) {
     unsigned int    c;
-    unsigned char  *dummy = strdup ("a*");
+    unsigned char  *dummy = (char *)strdup ("a*");
 
     for (c = 0; c < 256; c++) {
       if (isalnum (c) && islower (c)) {
@@ -238,7 +241,7 @@ postings (database_name, field, word, number_of_postings)
 
   fna[0] = NULL;
   if (field != NULL) {
-    fna[0] = strdup (field);
+    fna[0] = (char *)strdup (field);
     if ((db = open_database (database_name, fna, 1)) == NULL) {
       s_free (fna[0]);
       return (0);
@@ -326,7 +329,6 @@ postings (database_name, field, word, number_of_postings)
       int             wgt = 0;
       int             did;
       AV*             POST = (AV*)sv_2mortal((SV *)newAV());
-
       did = read_bytes_from_memory (DOCUMENT_ID_SIZE,
 				    posting_list + posting_list_pos);
 #ifdef LITTLEENDIAN
@@ -340,15 +342,14 @@ postings (database_name, field, word, number_of_postings)
 				posting_list +
 				(posting_list_pos + DOCUMENT_ID_SIZE));
 #endif
-      internal_weight =
+      internal_weight = 
 	read_weight_from_memory (NEW_WEIGHT_SIZE,
 				 posting_list +
 				 (posting_list_pos +
 				  DOCUMENT_ID_SIZE +
 				  NUMBER_OF_OCCURANCES_SIZE));
-
       if (TRACE)
-          fprintf (stderr, "did=%d weight=%f\n", did, internal_weight);
+          fprintf (stderr, "did=%d weight=%lf\n", did, internal_weight);
       PUSHs (sv_2mortal (newSViv (did)));
       PUSHs (sv_2mortal (newRV((SV*)POST)));
       av_push(POST, /* sv_2mortal */(newSVnv (internal_weight)));
@@ -374,7 +375,7 @@ postings (database_name, field, word, number_of_postings)
 					  char_list_size_readed);
 	  prev_char_list = tmp_char_list;
 	  tmp_char_list = (unsigned char *)
-	    readCompressedInteger (&distance, tmp_char_list);
+	    readCompressedInteger ((unsigned long *)&distance, tmp_char_list);
 	  txt_pos = first_txt_pos + prev_distance + distance;
 	  prev_distance += distance;
 	  char_list_size_readed += tmp_char_list - prev_char_list;

@@ -4,15 +4,20 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Fri Nov 10 15:35:13 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu Dec 28 16:48:37 1995
+ * Last Modified On: Tue Apr 30 08:57:17 1996
  * Language        : C
- * Update Count    : 8
+ * Update Count    : 9
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.h,v $
+ * Revision 2.1.1.2  1996/04/30 07:40:55  pfeifer
+ * patch9: Moved defined clash fixes to dictionary.h.
+ * patch9: This is not too clean - but dictionary.h is included
+ * patch9: in all C-Files.
+ *
  * Revision 2.1.1.1  1995/12/28 16:31:50  pfeifer
  * patch1:
  *
@@ -29,6 +34,19 @@
 
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
+
+#ifdef WORD
+#undef WORD			/* defined in the perl parser */
+#endif
+#ifdef _config_h_
+#undef _config_h_		/* load the freeWAIS-sf config.h also */
+#endif
+#ifdef warn
+#undef warn
+#endif
+#ifdef Strerror
+#undef Strerror
+#endif
 
 #include "cutil.h"
 #include "irfiles.h"

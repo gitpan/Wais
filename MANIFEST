@@ -1,6 +1,7 @@
 MANIFEST
 Makefile.PL
-Wais.pm
+lib/Wais.pm
+lib/Wais/Dict.pm
 Wais.xs
 HTWAIS.c
 HTWAIS.h
@@ -12,6 +13,7 @@ README
 ChangeLog                    Added ChangeLog
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
-inspect                      Example script for exploring wais databases.
+inspect.PL                   Example script for exploring wais databases.
 typemap
 Wais.pod                     Some documentation for the curious.
+chat2.pl.PL		     Autoextracting chat2.pl replacement

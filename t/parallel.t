@@ -5,15 +5,31 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 16:55:05 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Wed Dec 13 15:35:36 1995
+# Last Modified On: Sun Apr 21 12:25:09 1996
 # Language        : Perl
-# Update Count    : 55
+# Update Count    : 72
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: parallel.t,v $
+# Revision 2.1.1.5  1996/04/30 07:51:27  pfeifer
+# patch9: Database change.
+#
+# Revision 2.1.1.4  1996/04/09 13:07:00  pfeifer
+# patch8: More robust tests.
+#
+# Revision 2.1.1.3  1996/02/27 18:43:16  pfeifer
+# patch5: Now searchestwo databases in parallel ;-)
+#
+# Revision 2.1.1.2  1996/02/23 15:45:49  pfeifer
+# patch4: Added test for Wais::Docid::split.
+#
+# Revision 2.1.1.1  1996/02/21 13:29:33  pfeifer
+# patch3: MakeMaker 5.21 (002gamma) now produces TESTDB => q[/usr/..]
+# patch3: instead of TESTDB => '/usr/..'.
+#
 # Revision 2.1  1995/12/13  14:53:27  pfeifer
 # *** empty log message ***
 #
@@ -26,14 +42,18 @@ use Wais;
 
 open(MF, "Makefile") || die "could not open Makefile: $!";
 while (<MF>) {
-    if (/TESTDB => \'(.*)\'/) {
+    if (/TESTDB => (\'|q\[)(.*)(\'|\])/) {
+        $db = $2;
+        last;
+    } elsif (m/^TESTDB\s*=\s*(\S+)\s*$/) {
         $db = $1;
         last;
     }
 }
 close(MF);
+die "Which db?" unless $db;
 
-print "1..5\n";
+print "1..6\n";
 
 $host = 'ls6-www.informatik.uni-dortmund.de';
 $db2   = 'wais-docs';
@@ -42,12 +62,14 @@ print "Testing local searches\n";
 $result = Wais::Search({
     'query'    => 'pfeifer', 
     'database' => $db,
+    'database' => $db.'g',
     });
 
 &headlines($result);
-$id = ($result->header)[9]->[6];
+$id     = ($result->header)[9]->[6];
+$length = ($result->header)[9]->[3];
 @header = $result->header;
-print (($#header == 9)?"ok 1\n" : "not ok 1\n");
+print (($#header == 14)?"ok 1\n" : "not ok 1\n");
 
 print "Testing local retrieve\n";
 $result = Wais::Retrieve(
@@ -56,7 +78,8 @@ $result = Wais::Retrieve(
                          'type'     => 'TEXT',
                          );
 print $result->text;
-print ((length($result->text) == 406)?"ok 2\n" : "not ok 2\n");
+print length($result->text), "***\n";
+print ((length($result->text) == $length)?"ok 2\n" : "not ok 2\n");
 
 print "Testing remote searches\n";
 $result = Wais::Search({
@@ -94,7 +117,7 @@ $result = Wais::Retrieve(
 
 print $result->text;
 #print length($result->text), "===\n";
-print ((length($result->text) == 4453)?"ok 5\n" : "not ok 5\n");
+print ((length($result->text) == 3234)?"ok 5\n" : "not ok 5\n");
 
 sub headlines {
     my $result = shift;
@@ -107,4 +130,5 @@ sub headlines {
     }
 }
 
-
+@x = $short->split;
+print (($x[0] eq 'charly:210')? "ok 6\n" : "not ok 6\n");

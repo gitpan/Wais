@@ -4,15 +4,25 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Wed Dec 13 15:36:25 1995
+# Last Modified On: Tue Apr 30 09:36:43 1996
 # Language        : Perl
-# Update Count    : 65
+# Update Count    : 103
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Wais.pm,v $
+# Revision 2.1.1.4  1996/04/30 07:45:40  pfeifer
+# patch9: Added $VERSION for Wais::Result to make CPAN happy.
+#
+# Revision 2.1.1.3  1996/03/01 14:36:03  pfeifer
+# patch6: 'use vars' form some chat2.pl variables removed.
+#
+# Revision 2.1.1.2  1996/02/27 18:41:59  pfeifer
+# patch5: Sort headlines when merging.
+# patch5: Diagnostics are now saved as it should be.
+#
 # Revision 2.1  1995/12/13  14:52:30  pfeifer
 # *** empty log message ***
 #
@@ -35,15 +45,16 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-bootstrap Wais;
-
+$Wais::VERSION = 2.109;
+bootstrap Wais $VERSION;
 require 'chat2.pl';
 
 # make strict happy
-@we_know = ($chat::name, $chat::debug, $chat::aliases, $chat::family, $chat::nfound,
-            $chat::thisbuf, $chat::thishost, $chat::timeleft);
-@we_know = ($CHARS_PER_PAGE, $version);
-@we_know = ();
+
+@we_know = ($chat::debug, $chat::family,
+            $chat::nfound, $chat::thisbuf, $chat::thishost,
+            $chat::timeleft, $CHARS_PER_PAGE);
+@we_know = ();                  # will be 'use vars' some day :-)
 
 use Carp;
 
@@ -187,7 +198,7 @@ sub Retrieve {
     my $header   = '';
     my ($fh, $length);
     my $apdu; 
-    my $result = new Wais::Result;
+    my $result   = new Wais::Result('type' => $type);
     my $chunk = 0;
     my $presult;
 
@@ -220,10 +231,17 @@ sub Retrieve {
 }
 
 package Wais::Result;
-
+use vars qw($VERSION);
+{
+  my $Revision = '';
+  
+  $VERSION = join '', '$Revision: 2.1.1.4 $ ' =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+}
 sub new {
     my $type = shift;
-    my $self = {'header' => [], 'diagnostics' => [], 'text' => ''};
+    my %par  = @_;
+    my $self = {'header' => [], 'diagnostics' => [], 'text' => '', 
+                'type'   => $par{'type'}};
 
     bless $self, $type;
 }
@@ -234,11 +252,30 @@ sub add {
 
     if ($result) {
         if (ref($result)) {
-            for ($result->header) {
-                push(@{$self->{'header'}}, [$tag, @{$_}]);
+            my @result;
+            my @left  = @{$self->{'header'}};
+            my @right = $result->header;
+            while (($#left >= $[) or ($#right >= $[)) {
+                if ($#left < $[) {
+                    for (@right) {
+                        push @result, [$tag, @{$_}];
+                    }
+                    last;
+                }
+                if ($#right < $[) {
+                    push @result, @left;
+                    last;
+                }
+                if ($left[0]->[1] > $right[0]->[0]) {
+                    push @result, shift @left;
+                } else {
+                    push @result, [$tag, @{shift @right}];
+                }
             }
-            for ($result->diagnostics) {
-                push(@{$self->{'diagnostics'}}, [$tag, @{$_}]);
+            $self->{'header'} = \@result;
+            my %diag = $result->diagnostics;
+            for (keys %diag) {
+                push(@{$self->{'diagnostics'}}, [$tag, $_, $diag{$_}]);
             }
             if ($result->text) {
                 $self->{'text'} .= $result->text;

@@ -1,3 +1,123 @@
+Tue Apr 30 09:52:52 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch #9:
+
+	Made inspect autoextractive.
+
+	Now mainly uses the perl dictionary functions in Wais::Dict
+	which seem more stable than the XS equivalents. Can handle
+	numeric fields too now. Added non Curses mode for
+	debugging. The output is not very pretty yet.
+
+Wais
+	Added $VERSION for Wais::Result to make CPAN happy.
+
+Wais::Dict
+	Code wich allows to tie a WAIS dictionary to a hash. Used in
+	inspect.
+
+tests
+	Test now hides a bug(?). On solaris one get the results as
+	before. On sunos the DICTIONARY_TOTAL_SIZE_WORD is also
+	returned. Don't know which is the correct behaviour. I use
+	Wais::Dict now.
+
+
+Tue Apr  9 15:09:56 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 8:
+
+HTWAIS.c
+Wais.xs
+	Avoid some redifinition warnings.
+
+Wais.xs
+        STRLEN fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin)
+
+MANIFEST
+	Moved Wais.pm into lib.
+	Added chat2.pl replacement.
+
+Makefile.PL
+	Installation code for chat. Cleaned rest.
+
+t/*
+	More robust tests.
+
+
+Tue Apr  9 08:55:41 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Added registration facility.
+
+	Made Wais::Search::diagnostics ignore
+
+	D_PresentRequestOutOfRange complaints.
+
+	Fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin).
+
+Fri Mar  1 15:37:36 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+patch6 Description:
+
+MANIFEST
+	Removed patch-chat2, added chat2.pl.PL.
+Makefile.PL
+	Added rule to delete distributed chat2.pl.
+README
+	Description for chat2.pl replacement.
+Wais.pm
+	'use vars' form some chat2.pl variables removed.
+
+Tue Feb 27 19:44:07 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+patch5 Description:
+
+Wais.pm	
+	Sort headlines when merging.
+	Diagnostics are now saved as it should be.
+Wais.xs
+	Added some tabs for old xsubpp's.
+t/parallel.t
+	Now searches two databases in parallel ;-)
+
+Fri Feb 23 16:47:17 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+Makefile.PL
+	Now rewrites Wais.pm to include version number.
+Wais.pm
+	Wais::Result now saves the type of retrieve requests.
+Wais.pod
+	Documented Wais::Docid::new and Wais::Docid::split.
+Wais.xs
+	Rewrote Wais::Docid::new. Added Wais::Docid::split.
+t/parallel
+	Added test for Wais::Docid::split.
+
+Wed Feb 21 14:30:25 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	MakeMaker 5.21 (002gamma) now produces TESTDB => q[/usr/..]
+	instead of TESTDB => '/usr/..'. This broke the tests. Fixed that.
+
+Mon Feb  5 13:44:13 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch2:
+
+MANIFEST
+	Added patch-chat2 for SOLARIS.
+README
+	Added hints for SOLARIS.
+Wais.pod
+	Fixed typos.
+Wais.xs
+	Fixed some parameter declarations which confused older xsupps.
+
+
 Thu Dec 28 17:34:14 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 . Description:

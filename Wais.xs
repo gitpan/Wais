@@ -4,15 +4,39 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Fri Dec 22 13:47:01 1995
+ * Last Modified On: Tue Apr 30 09:04:44 1996
  * Language        : C
- * Update Count    : 330
+ * Update Count    : 365
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: Wais.xs,v $
+ * Revision 2.1.1.8  1996/04/30 07:40:51  pfeifer
+ * patch9: Moved defined clash fixes to dictionary.h.
+ * patch9: This is not too clean - but dictionary.h is included
+ * patch9: in all C-Files.
+ *
+ * Revision 2.1.1.7  1996/04/09 13:06:39  pfeifer
+ * patch8: Avoid some redifinition warnings.
+ *
+ * Revision 2.1.1.6  1996/04/09 06:55:36  pfeifer
+ * patch7: Fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin).
+ *
+ * Revision 2.1.1.5  1996/03/07 10:55:23  pfeifer
+ * patch7: Made Wais::Search::diagnostics ignore
+ * patch7: D_PresentRequestOutOfRange complaints.
+ *
+ * Revision 2.1.1.4  1996/02/27 18:42:41  pfeifer
+ * patch5: Added some tabs for old xsubpp's.
+ *
+ * Revision 2.1.1.3  1996/02/23 15:45:38  pfeifer
+ * patch4: Rewrote Wais::Docid::new. Added Wais::Docid::split.
+ *
+ * Revision 2.1.1.2  1996/02/05 12:42:35  pfeifer
+ * patch2: Fixed some parameter declarations which confused older xsupps.
+ *
  * Revision 2.1.1.1  1995/12/28 16:30:29  pfeifer
  * patch1: Support for docids.  Support for init messages. Renamed
  * patch1: database to database_name since some compilers are worried
@@ -39,12 +63,6 @@ extern "C" {
 }
 #endif
 
-#ifdef WORD
-#undef WORD			/* defined in the perl parser */
-#endif
-#ifdef _config_h_
-#undef _config_h_		/* load the freeWAIS-sf config.h also */
-#endif
 #include "dictionary.h"
 #include "HTWAIS.h"
 #include <docid.h>
@@ -57,19 +75,24 @@ extern "C" {
 #define CHARS_PER_PAGE 4096	/* number of chars retrieved in each request */
 int             WAISmaxdoc = 40;
 static int      Wais_inited = 0;
+static STRLEN  p_stl;
 
 void
 init_Wais()
 {
   char            buf[80];
-  SV             *version = perl_get_sv("Wais::version", TRUE);
+  SV             *version = perl_get_sv("Wais::VERSION", TRUE);
   SV             *recsep  = perl_get_sv("Wais::recsep", TRUE);
   SV             *fldsep  = perl_get_sv("Wais::fldsep", TRUE);
   SV             *maxdoc  = perl_get_sv("Wais::maxdoc", TRUE);
   SV             *cpp     = perl_get_sv("Wais::CHARS_PER_PAGE", TRUE);
 
-  sprintf(buf, "Wais %3.1f%d", VERSION, PATCHLEVEL);
+#ifdef XS_VERSION
+  sv_setpv(version, XS_VERSION);
+#else
+  sprintf(buf, "Wais %5.3f", VERSION + PATCHLEVEL/1000); 
   sv_setpv(version, buf);
+#endif
   sv_setpvn(recsep, "\000", 1);
   sv_setpvn(fldsep, "\001", 1);
   sv_setiv(maxdoc, WAISmaxdoc);
@@ -170,7 +193,7 @@ PPCODE:
 
 void
 dictionary(database_name, ...)
-	char *database_name
+	char *	database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -211,7 +234,7 @@ PPCODE:
 
 void
 list_offset(database_name, ...)
-	char *database_name
+	char *	database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -252,7 +275,7 @@ PPCODE:
 
 void
 postings(database_name, ...)
-	char *database_name
+	char *	database_name
 PPCODE:
 {
   char           *field = NULL;
@@ -285,14 +308,14 @@ PPCODE:
 }
 
 char *
-headline(database_name,docid)
-	char *	database_name;
-	long	docid;
+headline(database_name, docid)
+	char *	database_name
+	long	docid
 
 char *
 document(database_name,docid)
-	char *	database_name;
-	long	docid;
+	char *	database_name
+	long	docid
 CODE:
 {
   RETVAL = document(database_name, docid);
@@ -340,9 +363,9 @@ CODE:
 }
 
 char *
-generate_search_apdu(keywords,database_name, ...)
-	char *	keywords;
-	char *	database_name;
+generate_search_apdu(keywords, database_name, ...)
+	char *	keywords
+	char *	database_name
 CODE:
 {
   long            maxDocsRetrieved = SvIV(perl_get_sv("Wais::maxdoc", FALSE));
@@ -372,7 +395,8 @@ CODE:
 
 	itype = SvPV(*type, na);
 	if (sv_isa(*this, "Wais::Docid")) {
-	  DocID.bytes = SvPV(SvRV(*this), DocID.size);
+	  DocID.bytes = SvPV(SvRV(*this), p_stl);
+          DocID.size=p_stl;
 	} else {
 	  croak("Wais::generate_search_apdu: Invalid docid in request");
 	}
@@ -424,9 +448,9 @@ CODE:
 
 char *
 generate_retrieval_apdu(database_name, docid, type, ...)
-	char *	database_name;
-	char *	docid;
-	char *	type;
+	char *	database_name
+	char *	docid
+	char *	type
 CODE:
 {
   long            request_buffer_length = MAX_MESSAGE_LEN;
@@ -438,7 +462,8 @@ CODE:
   SV             *cpp = perl_get_sv("Wais::CHARS_PER_PAGE", TRUE);
 
   if (sv_isa(ST(1), "Wais::Docid")) {
-    DocID.bytes = SvPV(SvRV(ST(1)), DocID.size);
+    DocID.bytes = SvPV(SvRV(ST(1)), p_stl);
+    DocID.size=p_stl;
   } else {
     croak("Wais::generate_retrieval_apdu: Invalid docid in request");
   }
@@ -485,7 +510,7 @@ CODE:
 
 char *
 local_answer(request_message)
-	char *	request_message;
+	char *	request_message
 CODE:
 {
   long            request_length = na /* - HEADER_LENGTH */ ;	/* not used anyway */
@@ -516,9 +541,9 @@ CODE:
 
 MODULE = Wais PACKAGE = Wais::Init
 
-InitResponseAPDU*
+InitResponseAPDU *
 new(result_message)
-        char *  result_message;
+	char *	result_message
 CODE:
 {
   RETVAL = NULL;
@@ -547,7 +572,7 @@ OUTPUT:
 
 void
 DESTROY(init_response)
-     InitResponseAPDU*	init_response;
+	InitResponseAPDU *	init_response
 CODE:
 {
   if (TRACE)
@@ -564,7 +589,7 @@ OUTPUT:
 
 char *
 ImplementationID(init_response)
-     InitResponseAPDU*	init_response;
+	InitResponseAPDU *	init_response
 CODE:
 {
   RETVAL = init_response->ImplementationID;
@@ -574,7 +599,7 @@ OUTPUT:
 
 char *
 ImplementationName(init_response)
-     InitResponseAPDU*	init_response;
+	InitResponseAPDU *	init_response
 CODE:
 {
   RETVAL = init_response->ImplementationName;
@@ -584,7 +609,7 @@ OUTPUT:
 
 char *
 ImplementationVersion(init_response)
-     InitResponseAPDU*	init_response;
+	InitResponseAPDU *	init_response
 CODE:
 {
   RETVAL = init_response->ImplementationVersion;
@@ -595,11 +620,10 @@ OUTPUT:
 MODULE = Wais PACKAGE = Wais::Docid
 
 SV *
-new(type, server, database_name, localid)
-	char *  type;
-	char *	server;
-	char *	database_name;
-	char *	localid;
+new(server, database_name, localid, ...)
+	char *	server
+	char *	database_name
+	char *	localid
 CODE:
 {
   DocID           docID;
@@ -610,9 +634,12 @@ CODE:
   SV             *svdocid = sv_newmortal();
   HV             *stash = gv_stashpv("Wais::Docid", TRUE);
 
-  Server.bytes = SvPV(ST(1), Server.size);
-  Database.bytes = SvPV(ST(2), Database.size);
-  LocalID.bytes = SvPV(ST(3), LocalID.size);
+  Server.bytes = SvPV(ST(1), p_stl);
+  Server.size=p_stl;
+  Database.bytes = SvPV(ST(2), p_stl);
+  Database.size=p_stl;
+  LocalID.bytes = SvPV(ST(3), p_stl);
+  LocalID.size=p_stl;
 
   docID.originalServer = &Server;
   docID.distributorServer = &Server;
@@ -621,7 +648,24 @@ CODE:
   docID.originalLocalID = &LocalID;
   docID.distributorLocalID = &LocalID;
   docID.copyrightDisposition = COPY_WITHOUT_RESTRICTION;
-
+  if (items > 3) {
+    docID.copyrightDisposition =  SvIV(ST(4));
+  }
+  if (items > 4) {
+    Server.bytes = SvPV(ST(5), p_stl);
+    Server.size=p_stl;
+    docID.originalServer = &Server;
+  }
+  if (items > 5) {
+    Database.bytes = SvPV(ST(6), p_stl);
+    Database.size=p_stl;
+    docID.originalDatabase = &Database;
+  }
+  if  (items > 6) {
+    LocalID.bytes = SvPV(ST(7), p_stl);
+    LocalID.size=p_stl;
+    docID.originalLocalID = &LocalID;
+  }
   Result = anyFromDocID(&docID);
   sv_setpvn(svdocid, Result->bytes, Result->size);
   freeAny(Result);
@@ -631,12 +675,43 @@ CODE:
 OUTPUT:
 	RETVAL
 
+void
+split(docid)
+	char *	docid
+PPCODE:
+{
+  any raw;
+  DocID* new;
+
+  raw.bytes = SvPV(SvRV(ST(0)), p_stl);
+  raw.size=p_stl;
+  
+  if ((new = docIDFromAny(&raw)) != NULL) {
+    EXTEND(sp, 3);
+    PUSHs(sv_2mortal(newSVpv(new->distributorServer->bytes, 
+                             new->distributorServer->size)));
+    PUSHs(sv_2mortal(newSVpv(new->distributorDatabase->bytes,
+                             new->distributorDatabase->size)));
+    PUSHs(sv_2mortal(newSVpv(new->distributorLocalID->bytes,
+                             new->distributorLocalID->size)));
+    PUSHs(sv_2mortal(newSViv(new->copyrightDisposition)));
+    PUSHs(sv_2mortal(newSVpv(new->originalServer->bytes, 
+                             new->originalServer->size)));
+    PUSHs(sv_2mortal(newSVpv(new->originalDatabase->bytes,
+                             new->originalDatabase->size)));
+    PUSHs(sv_2mortal(newSVpv(new->originalLocalID->bytes,
+                             new->originalLocalID->size)));
+    freeDocID(new);
+  } else {
+    ST(0) = &sv_undef;
+  }
+}
 
 MODULE = Wais PACKAGE = Wais::Search
 
 SearchResponseAPDU *
 new(result_message)
-        char *  result_message;
+        char *	result_message
 CODE:
 {
   RETVAL = NULL;
@@ -648,7 +723,7 @@ OUTPUT:
 
 void
 DESTROY(query_response)
-	SearchResponseAPDU *	query_response;
+	SearchResponseAPDU *	query_response
 CODE:
 {
   if (TRACE)
@@ -665,7 +740,7 @@ OUTPUT:
 
 void
 diagnostics(response)
-	SearchResponseAPDU *	response;
+	SearchResponseAPDU *	response
 PPCODE:
 {
   WAISSearchResponse *info;
@@ -675,10 +750,15 @@ PPCODE:
     info = (WAISSearchResponse *) response->DatabaseDiagnosticRecords;
     if (info->Diagnostics != NULL) {
       for (i = 0; info->Diagnostics[i] != NULL; i++) {
-	EXTEND(sp, 2);
-	PUSHs(sv_2mortal(newSVpv(info->Diagnostics[i]->DIAG,
-				 DIAGNOSTIC_CODE_SIZE)));
-	PUSHs(sv_2mortal(newSVpv(info->Diagnostics[i]->ADDINFO, 0)));
+        char *tmp = D_PresentRequestOutOfRange;
+        /* Ignore 'request out of range' diags */
+        if ((info->Diagnostics[i]->DIAG[1] != tmp[1])
+            || (info->Diagnostics[i]->DIAG[0] != tmp[0])) {
+          EXTEND(sp, 2);
+          PUSHs(sv_2mortal(newSVpv(info->Diagnostics[i]->DIAG,
+                                   DIAGNOSTIC_CODE_SIZE)));
+          PUSHs(sv_2mortal(newSVpv(info->Diagnostics[i]->ADDINFO, 0)));
+        }
       }
     }
   }
@@ -686,7 +766,7 @@ PPCODE:
 
 void
 header(response)
-	SearchResponseAPDU *	response;
+	SearchResponseAPDU *	response
 PPCODE:
 {
   WAISSearchResponse *info;
@@ -728,7 +808,7 @@ PPCODE:
 
 void
 text(response)
-	SearchResponseAPDU *	response;
+	SearchResponseAPDU *	response
 PPCODE:
 {
   WAISSearchResponse *info;

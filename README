@@ -1,13 +1,14 @@
-For installation you need a installed perl5. I used perl5.002b1f.
-Also you need the freeWAIS-sf-2.0 distribution with patchlevel >=
-46. For compilation the source directory of freeWAIS-sf is used.  For
-the tests the test database in the freeWAIS-sf source directoryis
-used. So recreate it if you cleaned tehere.
+For installation you need a installed perl5. I used perl5.001n and
+perl5.002.  Also you need the freeWAIS-sf-2.0 distribution with
+patchlevel >= 46. For compilation the source directory of freeWAIS-sf
+is used.  For the tests the test database in the freeWAIS-sf source
+directory is used. So recreate it if you cleaned there.
 
 Untar the waisperl tarfile outside the perl source tree.  Then, you
 have to edit Makefile.PL and customize it with the name of your
-freeWAIS-sf source directory. (Hopefully, you didn't blow the latter
-away after compiling freeWAIS-sf. :))
+freeWAIS-sf source directory. 'perl Makefile.PL' will ask you for the
+directory if you did not do that. (Hopefully, you didn't blow the
+latter away after compiling freeWAIS-sf. :))
 
 Then run 'perl Makefile.PL'. For building a dynamic extension use 
 
@@ -20,6 +21,27 @@ For building a perl with the wais extensions statically linked use
 See the documentation of MakeMaker for details. Run
 
         perldoc ExtUtils::MakeMaker
+
+chat2.pl:
+
+        The standard chat2.pl does not work on SOLARIS. I have
+        included a self-extracting chat2.pl which will serve a
+        replacement for the distributions chat2.pl. It uses the socket
+        module to set the parameters. On systems on which chat2.pl
+        works, the replacement it will be some miliseconds faster ;-)
+
+        5.002:
+        You must remove the orignal chat2.pl since it will be in the
+        include path before this chat2.pl after installation. 'make
+        install' will ask you if it should be removed.  If you are
+        paranoid, run diff on both versions. They are identical
+        besides some socket constants. You can verify them in
+        sockets.h if you want to.
+
+        5.001
+        Installation will overwrite chat2.pl anyway ;-)
+
+        Trust me ;-)
 
 Ulrich Pfeifer
 

@@ -1,0 +1,399 @@
+#!/bin/perl
+
+use Config;
+use File::Basename qw(&basename &dirname);
+
+# List explicitly here the variables you want Configure to
+# generate.  Metaconfig only looks for shell variables, so you
+# have to mention them as if they were shell variables, not
+# %Config entries.  Thus you write
+#  $startperl
+# to ensure Configure will look for $Config{startperl}.
+
+# This forces PL files to create target in same directory as PL file.
+# This is so that make depend always knows where to find PL derivatives.
+chdir(dirname($0));
+($file = basename($0)) =~ s/\.PL$//;
+$file =~ s/\.pl$//
+	if ($^O eq 'VMS' or $^O eq 'os2');  # "case-forgiving"
+
+open OUT,">$file" or die "Can't create $file: $!";
+
+print "Extracting $file (with variable substitutions)\n";
+
+print OUT <<"!GROK!THIS!";
+$Config{'startperl'}
+!GROK!THIS!
+print OUT <<'!NO!SUBS!';
+eval 'exec perl -S $0 "$@"'
+    if 0;
+#                              -*- Mode: Perl -*- 
+# inspect -- 
+# ITIID           : $ITI$ $Header $__Header$
+# Author          : Ulrich Pfeifer
+# Created On      : Fri Nov 10 12:54:53 1995
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Tue Apr 23 10:14:45 1996
+# Language        : Perl
+# Update Count    : 321
+# Status          : Unknown, Use with caution!
+# 
+# (C) Copyright 1995, Universität Dortmund, all rights reserved.
+# 
+# $Locker: pfeifer $
+# $Log: inspect.PL,v $
+# Revision 2.1.1.1  1996/04/30 07:45:18  pfeifer
+# patch9: Now mainly uses the perl dictionary functions in Wais::Dict
+# patch9: which seem more stable. than the XS equivalents. Can handle
+# patch9: numeric fields too now. Added non Curses mode for
+# patch9: ddebugging. The output is not very pretty yet.
+#
+# Revision 2.0.1.1  1995/11/16  12:24:51  pfeifer
+# patch11: Examin Wais databases in directories given on the command
+# patch11: line. Needs Curses.
+#
+# Revision 1.1  1995/11/10  14:04:16  pfeifer
+# Initial revision
+#
+# 
+
+eval { use Curses; $HAVE_CURSES = 1; };
+use Wais;
+use Wais::Dict;
+
+@dbdirs = (
+           '/home/robots/wais/wais-sources',
+           '/usr/local/ls6/src/freeWAIS-sf-2.0/sun4-sunos/FIELD-EXAMPLE',
+           );
+
+
+if ($#ARGV < $[) {
+    @ARGV = @dbdirs;
+}
+
+
+if ($HAVE_CURSES) {       
+    initscr;                 # Set $COLS,$LINES
+} else {
+    print STDERR <<'EOF'
+You do not have perl Curses! Get them from CPAN!
+I will proceed anyway. But this mode is only usefull for debugging.
+EOF
+    ;
+    
+    $COLS  = 80;
+    $LINES = 24;
+}
+
+
+# find all databases
+my $dir;
+for $dir (@ARGV) {
+    for $dbsrc ( <$dir/*.src> ) {
+        $dbsrc =~ m:$dir/(.*)\.src$:;
+        $dbo = $db = $1;
+        while (defined $dbh{$db}) {
+            $db .= '0' unless $db =~ /\d$/;
+            $db++;
+        }
+        $dbh{$db}   = "$dir/$dbo";
+        $dbdir{$db} = $dir;
+    }
+}
+
+my $func = sub {display_path($_[0],$dbh{$_[1]})};
+
+# enter database selection loop
+my ($sel, $off);
+while (1) {
+    ($db, $sel, $off) = &Select("Select a database", $func, $sel, 
+                                $off, sort keys %dbh);
+    last unless $db;
+    
+    $dbpr = $dbh{$db}."_field_";
+    @fld = ('text');
+    for $fieldf ( <$dbpr*.dct> ) {
+        $fieldf =~ m:$dbpr(.*)\.dct:;
+        push(@fld, $1);
+    }
+    my ($sel, $off);
+    while (1) {
+        ($fld, $sel, $off) = &Select("Select a field", '', $sel, $off, @fld);
+        last unless $fld;
+        &Examin($dbh{$db}, $fld) if $fld;
+    }
+}
+
+END {
+    if ($HAVE_CURSES) {
+        endwin;
+        resetty;
+    }
+}
+
+
+sub Examin {
+    my($db,$field)= @_;
+    my($DICH, %DICT);
+    $field  = '' if $field eq 'text';
+    if ($field) {
+        $DICH = tie %DICT, Wais::Dict, "${db}_field_${field}";
+    } else {
+        $DICH = tie %DICT, Wais::Dict, "${db}";
+    }
+
+    my @prefix = sort {Wais::Dict::cmp($a,$b)} (0 .. 9, "a" .. "z", "ä", "ö", "ü", "ß");
+    my (%next, %prev);
+    my $last;
+
+    for (@prefix) {
+        $next{$last} = $_    if $last;
+        $prev{$_}    = $last if $last;
+        $last = $_;
+    }
+    $next{"z"} = "\377";
+    my ($sel, $off);
+    while (1) {
+        ($prefix, $sel, $off) = 
+            &Select("Select a prefix", '', $sel, $off, '<none>', @prefix);
+        last unless length($prefix);
+        $prefix = '' if $prefix eq '<none>';
+        
+        my (%words, @words, $pl, $word, $func);
+        $func = sub {display_wc($_[0],$words{$_[1]})};
+
+        if ($prefix and $prev{$prefix}) {
+            #$DICH->SET($prev{$prefix}."\377");
+          $DICH->SET($prefix);
+        } else {
+            my $key = $DICH->FIRSTKEY;
+            $words{$key} = $DICT{$key};
+        }
+        my $last = $next{$prefix} if ($prefix);
+
+        while (1) {
+            my $key = $DICH->NEXTKEY();
+            last unless defined $key;
+            last if $last and Wais::Dict::cmp($key,$last) != -1;
+            push @words, $key;
+            $words{$key} = $DICT{$key};
+        }
+        my ($sel, $off);
+        while (1) {
+            ($word, $sel, $off) = &Select("Select a word $prefix-$last", $func, 
+                                          $sel, $off, @words);
+            last unless $word;
+            &Postings($db,$field,$word,$DICH->POSTINGS($word));
+        }
+    }
+}
+
+sub Postings {
+    my($db,$field, $word, %postings)= @_;
+    my(@post);
+    my $hl = 'Here are the postings';
+    my ($sel,$did);
+
+    for (sort {$a <=> $b} keys %postings) {
+        my @p = @{$postings{$_}};
+        my $w = shift @p;
+
+        push(@post, sprintf("%6d %5.3f %s ", $_, $w, join(',', @p)));
+    }
+    my ($SEL, $off);
+    while (1) {
+        ($sel, $SEL, $off) = &Select('Select a posting', 
+                                     sub {diplay_headline($db, @_)}, 
+    $SEL, $off, @post);
+        last unless length($sel);
+        ($did) = ($sel =~ /^\s*(\d+)/);
+
+        my $width = $COLS -5;
+        my @lines = grep($_ = sprintf("%-${width}s", $_), 
+                         split (/\n/,  &Wais::document($db,$did)));
+        &Select('View the document '."$db,$did", '', 0, 0, @lines);
+    }
+}
+
+sub diplay_headline {
+    my ($db, $win, $line) = @_;
+    my ($did) = ($line =~ /^\s*(\d+)/);
+    my $hl =&Wais::headline($db, $did);
+
+    if ($HAVE_CURSES) {
+        $win->addstr(0,0, $hl);
+        $win->clrtoeol;
+        $win->refresh;
+    } else {
+        print "$hl\n";
+    }
+}
+
+sub display_wc {
+    my ($win, $wc) = @_;
+
+    if ($HAVE_CURSES) {
+        $win->addstr(0,0, sprintf "%5d", $wc);
+        $win->clrtoeol;
+        $win->refresh;
+    } else {
+        printf "%5d", $wc;
+    }
+}
+
+sub display_path {
+    my ($win, $path) = @_;
+
+    if ($HAVE_CURSES) {
+        $win->addstr(0,0, $path);
+        $win->clrtoeol;
+        $win->refresh;
+    } else {
+        print $path;
+    }
+}
+
+sub maxl {
+    my(@lines) = @_;
+    my $result = 8;
+
+    for (@lines) {
+        if (length($_)>$result) {
+            $result = length($_);
+        }
+    }
+    $result;
+}
+
+sub Select {
+    my($msg, $func, $select, $offset, @lines) = @_;
+    my $items  = $#lines+1;
+    my $iteml  = &maxl(@lines);
+    my $cols   = (int($COLS/($iteml+2)))?int($COLS/($iteml+2)):1;
+    my $lines  = $LINES-4;
+    my $pages  = int($items/($lines*$cols))+1;
+    my $result;
+    my $iop    = $lines*$cols;
+    my ($win, $inp, $tiw);
+
+    if ($HAVE_CURSES) {
+        $win    = new Curses ($lines+2,$COLS,1,0);
+        $inp    = new Curses (1,$COLS,$LINES-1,0);
+        $tiw    = new Curses (0,$COLS,0,0);
+    }
+    unless (int($COLS/($iteml+2))) {
+        for (@lines) {
+            $_ = substr($_, 0, $COLS-4);
+        }
+        $iteml = $COLS-4;
+    }
+    if ($HAVE_CURSES) {
+        $tiw->addstr($msg);
+        $tiw->refresh();
+        $win->box('|', '-');
+        $win->leaveok(1);
+        $inp->refresh();
+        noecho();
+        cbreak();
+        $inp->keypad(1);
+        $inp->leaveok(1);
+    } else {
+        print "$msg\n";
+    }
+    if (ref $func) {
+        &{$func}($inp,@lines[$select]);
+    }
+    while (1) {
+        my $sel    = $select;
+        my $co     = $offset;
+        &Redraw($win, $cols, $lines, $iteml, 
+                $offset, $select, @lines);
+        if ($HAVE_CURSES) {
+            $ch = $inp->getch();
+            if    ($ch == KEY_UP)    { $sel -= $cols}
+            elsif ($ch == KEY_DOWN)  { $sel +=$cols}
+            elsif ($ch == KEY_RIGHT) { $sel +=1}
+            elsif ($ch == KEY_LEFT)  { $sel -=1}
+            elsif (ord($ch) == 10)   { $result = $lines[$select]; last; }
+            elsif (ord($ch) == 22)   { $co+=$iop; }
+            elsif ($ch == KEY_NPAGE) { $co+=$iop; }
+            elsif ($ch == KEY_PPAGE) { $co-=$iop; }
+            elsif (ord($ch) ==118)   { $co-=$iop; }
+            elsif ($ch eq "q")       { $result = ''; last; }
+            else { $inp->addstr(ord($ch)); }
+        } else {
+            print "> ";
+            chomp($ch = <STDIN>);
+            $result = $ch;
+            ($ch) = ($ch =~ m/^(.)/);
+            if    ($ch eq '^')       { $sel -= $cols}
+            elsif ($ch eq 'v')       { $sel +=$cols}
+            #elsif ($ch eq '>')       { $sel +=1}
+            #elsif ($ch eq '<')       { $sel -=1}
+            elsif ($ch eq '')        { $co+=$iop; }
+            elsif ($ch eq 'P')       { $co-=$iop; }
+            elsif ($ch eq 'Q')       { $result = ''; last; }
+            else {
+                print "Select '$result' (y/n)? ";
+                chomp($ch = <STDIN>);
+                if ($ch =~ /^[yY]/) {
+                    return ($result, $select, $offset);
+                }
+            }
+        }
+        if ($co != $offset) {
+            if ($co < 0) {
+                $co = 0;
+            } elsif ($co > $items) {
+                $co = $offset;
+            }
+
+            $sel -= ($offset - $co);
+
+            $offset = $co;
+        }
+        if (($sel >= $offset+$iop) && ($sel < $items)) {
+            $offset += $cols if $offset+$cols <= $items;
+        } elsif (($sel < $offset) && ($sel >= 0)) {
+            $offset -= $cols if $offset-$cols >= 0;
+        } 
+        if (($sel >= 0) && ($sel < $items)) {
+            $select = $sel;
+            if (ref $func) {
+                &{$func}($inp,@lines[$select]);
+            }
+        } else {
+            beep;
+        }
+    }
+    if ($HAVE_CURSES) {
+        $win->delwin;
+        $inp->delwin;
+        $tiw->delwin;
+    }
+    return ($result, $select, $offset);
+}
+    
+sub Redraw {
+    my ($win, $cols, $lines, $iteml, $offset, $select, @lines) = @_;
+
+    ROW: for $row (1 .. $lines) {
+        for $col (1 .. $cols) {
+            if ($HAVE_CURSES) {
+                $win->attron(A_REVERSE) if ($offset == $select);
+                $win->addstr($row, ($col-1)*($iteml+2)+2, 
+                             sprintf ("%-${iteml}s", $lines[$offset]));
+                $win->attrset(A_NORMAL) if ($offset == $select);
+            } else {
+                printf ("%-${iteml}s", $lines[$offset]);
+            }
+            $offset++;
+        }
+        print "\n" unless $HAVE_CURSES;
+    }
+    $win->refresh if $HAVE_CURSES;
+}
+!NO!SUBS!
+close OUT or die "Can't close $file: $!";
+chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
+exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';

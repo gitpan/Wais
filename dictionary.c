@@ -4,57 +4,17 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Tue Nov 26 13:44:48 1996
+ * Last Modified On: Thu May  1 14:39:34 1997
  * Language        : C
- * Update Count    : 210
+ * Update Count    : 240
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
- * $Locker:  $
- * $Log: dictionary.c,v $
- * Revision 2.3  1997/02/06 09:31:05  pfeifer
- * Switched to CVS
- *
- * Revision 2.2  1996/08/19 17:15:20  pfeifer
- * perl5.003
- *
- * Revision 2.1.1.1  1995/12/28 16:31:39  pfeifer
- * patch1: Casted result of strdup to make sure.
- *
- * Revision 2.1  1995/12/13  14:56:27  pfeifer
- * *** empty log message ***
- *
- * Revision 2.0.1.8  1995/12/12  11:46:37  pfeifer
- * patch13: sprinf fixes.
- *
- * Revision 2.0.1.7  1995/11/16  12:23:48  pfeifer
- * patch11: Added document.
- * patch11: Fixed postings bug (did not allocate space on stack).
- *
- * Revision 2.0.1.6  1995/11/14  14:52:52  pfeifer
- * patch11: Added document (SV *)
- *
- * Revision 2.0.1.5  1995/11/10  14:52:38  pfeifer
- * patch9: Added headline().
- *
- * Revision 2.0.1.4  1995/11/09  20:30:47  pfeifer
- * patch8: Added postings().
- *
- * Revision 2.0.1.2  1995/11/08  15:15:02  pfeifer
- * patch6: Reorganized dictionary stuff completely.
- *
- * Revision 2.0.1.1  1995/11/08  08:21:49  pfeifer
- * patch5: Code for examining local wais databases.
- *
- * Revision 1.2  1995/11/07  15:17:19  pfeifer
- * Versuch mit hash.
- *
- * Revision 1.1  1995/11/07  12:46:18  pfeifer
- * Initial revision
- *
  */
+
 #define BIG 10000
+
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -68,6 +28,16 @@
 #endif
 
 #include "dictionary.h"
+
+#ifdef WAIS_USES_STDIO
+#include <stdio.h>
+#ifdef fseek
+#undef fseek
+#endif
+#define my_fseek(stream, offest, flag) fseek(stream, offest, flag)
+#else
+#define my_fseek(stream, offest, flag) PerlIO_seek(stream, offest, flag)
+#endif
 
 database       *
 open_database (db_name, fields, nfields)
@@ -203,7 +173,7 @@ find_word (database_name, field, word, offset, matches)
 
 #define W_ERROR(M,V) \
 {\
-        char           buff[80];\
+        char           buf[80];\
         SV             *error = perl_get_sv ("Wais::errmsg", TRUE);\
 \
         if (db) disposeDatabase (db);\
@@ -274,13 +244,8 @@ postings (database_name, field, word, number_of_postings)
     stream = db->field_index_streams[pick_up_field_id (field, db)];
   else
     stream = db->index_stream;
-#ifdef WAIS_USES_STDIO
-#ifdef fseek
-#undef fseek
-#endif
-#endif
 
-  if (0 != fseek (stream, (long) index_file_block_number,
+  if (0 != my_fseek (stream, (long) index_file_block_number,
 		  SEEK_SET)) {
     W_ERROR ("fseek failed into the inverted file to position %ld",
 	     (long) index_file_block_number);
@@ -339,7 +304,7 @@ postings (database_name, field, word, number_of_postings)
     for (count = 0; count < number_of_valid_entries; count++) {
       int             wgt = 0;
       int             did;
-      AV*             POST = (AV*)sv_2mortal((SV *)newAV());
+      AV*             POST = newAV();
       did = read_bytes_from_memory (DOCUMENT_ID_SIZE,
 				    posting_list + posting_list_pos);
 #if (BYTEORDER & 0xffff) == 0x1234
@@ -362,8 +327,8 @@ postings (database_name, field, word, number_of_postings)
       if (TRACE)
           fprintf (stderr, "did=%d weight=%lf\n", did, internal_weight);
       PUSHs (sv_2mortal (newSViv (did)));
-      PUSHs (sv_2mortal (newRV((SV*)POST)));
-      av_push(POST, /* sv_2mortal */(newSVnv (internal_weight)));
+      PUSHs (sv_2mortal (newRV_noinc((SV*)POST)));
+      av_push(POST, (newSVnv (internal_weight)));
       char_list_size_readed = 0;
       first_char_pos_readed = false;
       first_txt_pos = prev_distance = distance = 0;
@@ -391,7 +356,7 @@ postings (database_name, field, word, number_of_postings)
 	  prev_distance += distance;
 	  char_list_size_readed += tmp_char_list - prev_char_list;
 	}
-        av_push(POST, /* sv_2mortal */(newSViv (txt_pos)));
+        av_push(POST, newSViv (txt_pos));
         if (TRACE)
             fprintf (stderr, "distance=%d\n", txt_pos);
 	prev_distance += distance;
@@ -495,7 +460,7 @@ document (database_name, docid)
   if (NULL == input_stream) {
     W_ERROR ("File %s does not exist", filename);
   }
-  if (fseek (input_stream, doc_entry.start_character, SEEK_SET) != 0) {
+  if (my_fseek (input_stream, doc_entry.start_character, SEEK_SET) != 0) {
     W_ERROR ("retrieval can't seek to %ld", doc_entry.start_character);
   }
   length = doc_entry.end_character - doc_entry.start_character;
@@ -503,15 +468,8 @@ document (database_name, docid)
   if (NULL == buf) {
     W_ERROR ("Out of memory", 0);
   }
-#ifdef WAIS_USES_STDIO
-#ifdef fread
-#undef fread
-#endif
-  bytesRead = fread ((void *) buf, (size_t) sizeof (char),
- 		     length, input_stream);
-#else
-  bytesRead = PerlIO_read (input_stream, (void *) buf, length);
-#endif
+
+  bytesRead = fread_from_stream(input_stream, buf, length);
 
   if (bytesRead != length) {
     W_ERROR ("Could not read document completely %d", length-bytesRead);

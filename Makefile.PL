@@ -4,9 +4,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Feb 14 16:45:24 1997
+# Last Modified On: Thu May  1 14:33:27 1997
 # Language        : Perl
-# Update Count    : 221
+# Update Count    : 228
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -15,8 +15,8 @@
 use ExtUtils::MakeMaker;
 use Config;
 
-$VERSION = getversion('patchlevel.h');
-rewrite('Wais.pm', 'Wais', $VERSION);
+# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion: 23 $/10 + $ProjectMinorVersion: 2 $/1000;"
+$VERSION = sprintf '%5.3f', 23/10 + 1/1000;
 
 for (qw(waisserver waisindex)) {
   die "Could not find '$_' in your PATH\n"
@@ -24,7 +24,6 @@ for (qw(waisserver waisindex)) {
 }
 
 my $PREOP = qq(
-               changelog -update;
                pod2text INSTALL.pod > INSTALL;
                pod2text Wais.pm     > README;
               );
@@ -83,30 +82,6 @@ sub moduleversion {
   $version;
 }
 
-sub rewrite {
-    my ($file, $package, $VERSION) = @_;
-    my $bak = "$file.bak";
-
-    return if moduleversion($file, $package) eq $VERSION;
-    rename $file, $bak or die "Could not rename $file: $!";
-    open(IN, $bak) || die "Could not open $bak: $!";
-    open(OUT, ">$file") || die "Could not open $file: $!";
-    print STDERR "Rewriting $file\n";
-
-    while (<IN>) {
-        if (/^\$VERSION/) {
-            print OUT '$'.'VERSION = '."'$VERSION';\n";
-            print STDERR '$'.'VERSION = '."'$VERSION';\n";
-        } else {
-            print OUT;
-        }
-    }
-    close(IN);
-    close(OUT);
-    unlink $bak;
-}
-
-  
 sub MY::postamble {
     my $self = shift;
     

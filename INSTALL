@@ -15,7 +15,6 @@ Requirements
             perl .../mkinc -I../ctype ui.h cutil.h irext.h irfiles.h \
                  irsearch.h irtfiles.h weight.h docid.h > wais.h
 
-
     The `...' must be replaced by the path to this directory. Then move
     `wais.h' to a place where your C-compiler can find it.
 
@@ -39,7 +38,6 @@ Requirements
             ar rc libwais.a *.o
             ranlib libwais.a 
 
-
     Depending an your system, the `ar' flags might differ or the `ranlib'
     may be obsolete. Please consult the ar manpage and the ranlib manpage.
     In addition you may examine the output of perl -V:ar -V:ranlib
@@ -61,7 +59,6 @@ Requirements
       t/parallel.t                  6    4  66.67%  3-6  <- 'remote' searches
       t/z_postop.t                  2    1  50.00%  1    <- server stop
 
-
 Building this extension
     Make sure that you met the requirements above. If your perl supports
     dynamic loading, do:
@@ -72,28 +69,23 @@ Building this extension
             make install
             make clean
 
-
     If you want to build a perl with this extension statically linked in do:
 
             make Makefile.PL
             make waisperl
             make test_static
 
-
     To install the new "waisperl" binary, call
 
         make -f Makefile.aperl inst_perl MAP_TARGET=waisperl
-
 
     To remove the intermediate files say
 
         make -f Makefile.aperl map_clean
 
-
     If something goes wrong during `make test', try
 
         make test TEST_VERBOSE=1
-
 
     or
 

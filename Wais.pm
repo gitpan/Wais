@@ -4,9 +4,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Feb 14 16:36:18 1997
+# Last Modified On: Thu May  1 11:00:46 1997
 # Language        : Perl
-# Update Count    : 160
+# Update Count    : 161
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -23,7 +23,9 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-$VERSION = '2.300';
+# $Format: "\$VERSION = sprintf '%5.3f', $ProjectMajorVersion: 23 $/10 + $ProjectMinorVersion: 2 $/1000;"
+$VERSION = sprintf '%5.3f', 23/10 + 1/1000;
+
 bootstrap Wais $VERSION;
 
 use IO::Socket;

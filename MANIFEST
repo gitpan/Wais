@@ -14,7 +14,6 @@ dictionary.c                 Code for examining local wais databases.
 dictionary.h
 inspect.PL                   Example script for exploring wais databases.
 mkinc                        Script to generate wais.h
-patchlevel.h
 t/a_preop.t                  Index test database, start server
 t/basic.t
 t/dict.t

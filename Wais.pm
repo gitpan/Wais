@@ -4,20 +4,15 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon Feb  3 16:35:55 1997
+# Last Modified On: Thu Feb 13 13:17:12 1997
 # Language        : Perl
-# Update Count    : 149
+# Update Count    : 155
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
-# $Log: Wais.pm,v $
-# Revision 2.1.1.10  1997/02/03 15:29:51  pfeifer
-# patch2: fix from Norbert Goevert to allow for failing connections
 
 package Wais;
-require 5.003;
 
 require DynaLoader;
 
@@ -28,7 +23,7 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-$VERSION = '2.202';
+$VERSION = '2.203';
 bootstrap Wais $VERSION;
 
 use IO::Socket;
@@ -133,7 +128,7 @@ sub Search {
     for $fh (@ready) {
       my $tag = $tag{$fh};
       my $header = '';
-      
+
       $fh->read($header, 25);
       my $length = substr($header,0,10);
       $fh->read($message, $length);
@@ -149,6 +144,7 @@ sub Search {
         delete $pending{$fh}->{$tag};
       } else {
         # we are done with this guy
+        $select->remove($fh);
         $fh->close;
       }
       last unless $missing;
@@ -205,12 +201,6 @@ sub Retrieve {
 }
 
 package Wais::Result;
-use vars qw($VERSION);
-{
-  my $Revision = '';
-  
-  $VERSION = join '', q$Revision: 2.1.1.10 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
-}
 
 sub new {
   my $type = shift;

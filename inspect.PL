@@ -40,8 +40,11 @@ eval 'exec perl -S $0 "$@"'
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
+# $Locker:  $
 # $Log: inspect.PL,v $
+# Revision 2.3  1997/02/06 09:31:07  pfeifer
+# Switched to CVS
+#
 # Revision 2.2  1996/08/19 17:15:20  pfeifer
 # perl5.003
 #

@@ -12,8 +12,11 @@
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
+# $Locker:  $
 # $Log: parallel.t,v $
+# Revision 2.3  1997/02/06 09:31:14  pfeifer
+# Switched to CVS
+#
 # Revision 2.2  1996/08/19 17:15:20  pfeifer
 # perl5.003
 #

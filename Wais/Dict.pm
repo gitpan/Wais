@@ -5,15 +5,21 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Oct 17 15:40:08 1996
+# Last Modified On: Thu Feb  6 13:46:36 1997
 # Language        : Perl
-# Update Count    : 108
+# Update Count    : 109
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
+# $Locker:  $
 # $Log: Dict.pm,v $
+# Revision 2.4  1997/02/13 12:25:52  pfeifer
+# Ready for next release
+#
+# Revision 2.3  1997/02/06 09:31:11  pfeifer
+# Switched to CVS
+#
 # Revision 2.1.1.5  1996/08/08 07:12:13  pfeifer
 # patch15: Fixed little endian problem.
 #
@@ -37,12 +43,6 @@
 # 
 
 package Wais::Dict;
-use vars qw($VERSION);
-{
-  my $Revision = '';
-  
-  $VERSION = join '', q$Revision: 2.1.1.5 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
-}
 use Carp;
 use FileHandle;
 

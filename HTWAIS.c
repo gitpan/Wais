@@ -14,8 +14,11 @@
  * 
  * HISTORY
  * 
- * $Locker: pfeifer $
+ * $Locker:  $
  * $Log: HTWAIS.c,v $
+ * Revision 2.3  1997/02/06 09:34:43  pfeifer
+ * Switched to CVS
+ *
  * Revision 2.2  1996/08/19 17:15:20  pfeifer
  * perl5.003
  *

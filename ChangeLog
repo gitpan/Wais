@@ -1,347 +1,518 @@
-Mon Feb  3 16:31:36 MET 1997   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Thu Feb 13 12:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* Wais.pm: Added (obsolete?) call to select remove in Search().
+  	  Without it, can_read() did return without data available.
+  	  searches to multiple extern servers should work more reliably
+ 	  now.
 
-	Added fix from Norbert Goevert wich make the failure of
- 	connections non-fatal.
-	
-Mon Aug 19 17:32:01 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Makefile.PL: Added ChangeLog generation
 
-. Description:
+Thu Feb  6 09:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+	* Makefile.PL: remove inspect upon "make clean"
 
-	Added stemming test.
+Mon Feb  3 15:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	README mentions 'make waisperl' now.
+	* Wais.pm: Major rewrite.
 
-	Documented stemming & co in Wais.pod
+	* Makefile.PL: Removed chat2 stuff.
 
-	Fixed call for setemming stuff.
+	* ChangeLog: Added fix to tolerate connections failing.
 
-	Thu Aug  8 09:12:40 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Mon Aug 19 17:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Description patch 15:
+	* ChangeLog HTWAIS.c HTWAIS.h MANIFEST Makefile.PL README Wais.pm
+	  Wais.pod Wais.xs dictionary.c dictionary.h inspect.PL mkinc
+	  typemap Wais/Dict.pm t/basic.t t/dict.t t/ndict.t t/parallel.t:
+	  perl5.003
 
-Dict.pm
-	Fixed little endian problem.
+Mon Aug 19 15:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Thu Aug  1 20:15:26 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Wais.pod: Documented stemming & co in Wais.pod
 
-Description patch14:
+	* README: README mentions 'make waisperl' now.
 
-Makefile.PL
-	Source building method now includes 'ctype.o' if found.
-	This should help people with freeWAIS-sf distributions which 
-	do not include it in libwais.a (i.e. all current public availabe 
-        versions. 
-t/
-	Added new test fro Dict.pm.
+	* Wais.xs: Fixed call for setemming stuff.
 
-t/parallel.t
-	Added use lib '.' to make it find chat2.pl in current
-	directory.
+	* MANIFEST: Added stemming test.
 
-lib/Wais/Dict.pm
-        Some fixes to make 'perl -w' happy.
+	* ChangeLog: Fixed stemming stuff
 
+Thu Aug  8 07:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
+	* Wais/Dict.pm: Fixed little endian problem.
 
-Mon Jul 22 17:41:02 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* ChangeLog: Fixed Dict.pm to make in run on little endian machines
+	  too.
 
-. Description:
+	* Wais.pm: perl -w
 
-	added some hints for freeWAIS-sf 2.1.1
+	* Makefile.PL: Fixed ctype.o stuff. Upgrade to 5.003_01.
 
-	Added HAS_GUNDFORM.
+Thu Aug  1 18:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-		Fix from Norbert Goevert.
+	* MANIFEST: Added new test fro Dict.pm.
 
-Mon Jul 22 17:41:02 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* ChangeLog: Superficail fixes README needs revision.
 
-. Description:
+	* Wais/Dict.pm: Some fixes to make 'perl -w' happy.
 
-	added some hints for freeWAIS-sf 2.1.1
+	* t/parallel.t: Added use lib '.' to make it find chat2.pl in
+	  current directory.
 
-	Added HAS_GUNDFORM.
+	* Makefile.PL: Source building method now includes 'ctype.o' if
+	  found. This should help people with freeWAIS-sf distributions
+	  which do not include it in libwais.a.
 
-		Fix from Norbert Goevert.
+	* t/ndict.t: Need harder tests here for binsearch().
 
-Tue Jul 16 18:43:51 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Mon Jul 22 15:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Description patch10:
+	* Wais/Dict.pm: Fix from Norbert Goevert.
 
-	Modified for building from installed freeWAIS-sf libraries
-	and include files. Added info how to build wais.h
+	* ChangeLog: Minor fixes
 
-Wais.xs
-	Added support for stemming/soundex/phonix. New functions are
-        not yet documented.
+	* Wais.xs: Added HAS_GUNDFORM.
 
-lib/Wais/Dict.pm
-	Fixed a bug in  binsearch. Thanks to Norbert Goevert!
+	* Makefile.PL: Added AP prototype to Wais.h
 
+	* README: added some hints for freeWAIS-sf 2.1.1
 
-Tue Apr 30 09:52:52 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Tue Jul 16 16:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Description patch #9:
+	* t/parallel.t: Made test al little sloppier ;-)
 
-	Made inspect autoextractive.
+	* Wais/Dict.pm: Fixe a bug nin	binsearch. Thanks to Norbert
+	  Goevert!
 
-	Now mainly uses the perl dictionary functions in Wais::Dict
-	which seem more stable than the XS equivalents. Can handle
-	numeric fields too now. Added non Curses mode for
-	debugging. The output is not very pretty yet.
+	* MANIFEST: Added mkinc.
 
-Wais
-	Added $VERSION for Wais::Result to make CPAN happy.
+	* MANIFEST: Added mkinc
 
-Wais::Dict
-	Code wich allows to tie a WAIS dictionary to a hash. Used in
-	inspect.
+	* Wais.pod: Fixed some typos. New functions are not yet documented.
 
-tests
-	Test now hides a bug(?). On solaris one get the results as
-	before. On sunos the DICTIONARY_TOTAL_SIZE_WORD is also
-	returned. Don't know which is the correct behaviour. I use
-	Wais::Dict now.
+	* ChangeLog: freeWAIS-sf-2.1.1 certified.
 
+	* mkinc: Script for building wais.h from the freeWAIS-sf source
+	  directory.
 
-Tue Apr  9 15:09:56 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* HTWAIS.c HTWAIS.h Makefile.PL dictionary.h: Modified for building
+	  from installed freeWAIS-sf libraries and include files.
 
-Description patch 8:
+	* chat2.pl.PL: Autoextracting chat2.pl replacement.
 
-HTWAIS.c
-Wais.xs
-	Avoid some redifinition warnings.
+	* Wais.xs: Modified for building from installed freeWAIS-sf
+	  libraries and include files. Added support for
+	  stemming/sunodex/phonix.
 
-Wais.xs
-        STRLEN fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin)
+	* README: Additional info hown to build wais.h
 
-MANIFEST
-	Moved Wais.pm into lib.
-	Added chat2.pl replacement.
+Tue Apr 30 07:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Makefile.PL
-	Installation code for chat. Cleaned rest.
+	* ChangeLog: Cleaned second 008 ;-)
 
-t/*
-	More robust tests.
+	* MANIFEST: Made inspect autoextractive.
 
+	* Wais.xs dictionary.h: Moved defined clash fixes to dictionary.h.
+	  This is not too clean - but dictionary.h is included in all
+	  C-Files.
 
-Tue Apr  9 08:55:41 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* MANIFEST: Added lib/Wais/Dict.pm.
 
-. Description:
+	* inspect.PL: Now mainly uses the perl dictionary functions in
+	  Wais::Dict which seem more stable. than the XS equivalents. Can
+	  handle numeric fields too now. Added non Curses mode for
+	  ddebugging. The output is not very pretty yet.
 
-	Added registration facility.
+	* t/parallel.t: Database change.
 
-	Made Wais::Search::diagnostics ignore
+	* Wais/Dict.pm: Code wich allows to tie a WAIS dictionary to a
+	  hash. Used in inspect.
 
-	D_PresentRequestOutOfRange complaints.
+	* t/dict.t: Test now hides a bug(?). On solaris one get the results
+	  as before. On sunos the DICTIONARY_TOTAL_SIZE_WORD is also
+	  returned. Don't know which is the correct behaviour. I use
+	  Wais::Dict now.
 
-	Fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin).
+	* Makefile.PL: Version in Wais.pm is only overwritten if necessary.
 
-Fri Mar  1 15:37:36 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Wais.pm: Added $VERSION for Wais::Result to make CPAN happy.
 
-patch6 Description:
+Tue Apr 23 08:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-MANIFEST
-	Removed patch-chat2, added chat2.pl.PL.
-Makefile.PL
-	Added rule to delete distributed chat2.pl.
-README
-	Description for chat2.pl replacement.
-Wais.pm
-	'use vars' form some chat2.pl variables removed.
+	* Wais/Dict.pm: Initial revision
 
-Tue Feb 27 19:44:07 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Tue Apr  9 13:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-patch5 Description:
+	* Makefile.PL: INstallation code for chat. Cleaned rest.
 
-Wais.pm	
-	Sort headlines when merging.
-	Diagnostics are now saved as it should be.
-Wais.xs
-	Added some tabs for old xsubpp's.
-t/parallel.t
-	Now searches two databases in parallel ;-)
+	* HTWAIS.h Wais.xs: Avoid some redifinition warnings.
 
-Fri Feb 23 16:47:17 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* t/basic.t t/dict.t t/parallel.t: More robust tests.
 
-. Description:
+	* MANIFEST: Moved Wais.pm into lib. Added chat2.pl replacement.
 
-Makefile.PL
-	Now rewrites Wais.pm to include version number.
-Wais.pm
-	Wais::Result now saves the type of retrieve requests.
-Wais.pod
-	Documented Wais::Docid::new and Wais::Docid::split.
-Wais.xs
-	Rewrote Wais::Docid::new. Added Wais::Docid::split.
-t/parallel
-	Added test for Wais::Docid::split.
+	* ChangeLog: Cleanup.
 
-Wed Feb 21 14:30:25 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Tue Apr  9 06:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* Wais.xs: Fixes by malyshki@cs.wmich.edu (Vladislav Malyshkin).
 
-	MakeMaker 5.21 (002gamma) now produces TESTDB => q[/usr/..]
-	instead of TESTDB => '/usr/..'. This broke the tests. Fixed that.
+Thu Mar  7 10:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Mon Feb  5 13:44:13 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Wais.xs: Made Wais::Search::diagnostics ignore
+	  D_PresentRequestOutOfRange complaints.
 
-Description patch2:
+Thu Mar  7 09:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-MANIFEST
-	Added patch-chat2 for SOLARIS.
-README
-	Added hints for SOLARIS.
-Wais.pod
-	Fixed typos.
-Wais.xs
-	Fixed some parameter declarations which confused older xsupps.
+	* Makefile.PL: Added registration facility.
 
+Fri Mar  1 14:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Thu Dec 28 17:34:14 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* MANIFEST: Removed patch-chat2, added chat2.pl.PL.
 
-. Description:
+	* Wais.pm: 'use vars' form some chat2.pl variables removed.
 
+	* ChangeLog: Added chat2.pl replacement.
 
-Added support for Document ids and init messages.
+	* README: Description for chat2.pl replacement.
 
-Wed Dec 13 15:57:27 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Makefile.PL: Added rule to delete distributed chat2.pl.
 
-. Description:
+Tue Feb 27 18:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Wed Dec 13 09:42:07 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Wais.xs: Added some tabs for old xsubpp's.
 
-. Description:
+	* t/parallel.t: Now searchestwo databases in parallel ;-)
 
-MANIFEST
-	Added typemap.
-Makefile.PL
-	Added -noprototypes.
-Wais.pm
-	Added Retrieve().
-Wais.xs
-	Added CHARS_PER_PAGE.
+	* Wais.pm: Sort headlines when merging. Diagnostics are now saved
+	  as it should be.
 
-	Tue Dec 12 12:46:55 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* ChangeLog: Norbert starts with SFgate-5.0 ;-)
 
-. Description:
+Mon Feb 26 14:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Parallel search works.
-	sprintf fixes.
+	* Dict.pm: Initial revision
 
-Fri Dec  8 20:34:18 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Fri Feb 23 15:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* t/parallel.t: Added test for Wais::Docid::split.
 
-Makefile.PL
-	2beta1 conformant.
+	* Wais.xs: Rewrote Wais::Docid::new. Added Wais::Docid::split.
 
-	Added plenty of stuff for direct access to the Protokoll.
-	When finished, parallel searching will be possible.
-	Currently only search works. But it can handle relevance-
-	feedback. Document type currently is not availabe.
-        Documenttype "TEXT" is hardcoded for now.
+	* ChangeLog: Approacing SFgate 5.0 ...
 
-Thu Nov 16 13:25:34 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Makefile.PL: Now rewrites Wais.pm to include version number.
 
-. Description:
+	* Wais.pod: Documented Wais::Docid::new and Wais::Docid::split.
 
-	Added document (SV *)
+	* Wais.pm: Wais::Result now saves the type of retrieve requests.
 
-	Added inspect: Examin Wais databases in directories given on
-	the command line. Needs Curses.
+Wed Feb 21 13:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Fixed postings bug (did not allocate space on stack).
+	* ChangeLog: MakeMaker 5.21
 
-	
+	* t/basic.t t/dict.t t/parallel.t: MakeMaker 5.21 (002gamma) now
+	  produces TESTDB => q[/usr/..] instead of TESTDB => '/usr/..'.
 
-Fri Nov 10 17:24:59 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Mon Feb  5 12:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* README: Added hints for SOLARIS.
 
-	Replaced magic variables. By real Variables.
+	* MANIFEST MANIFEST: Added patch-chat2 for SOLARIS.
 
-	Added version.
+	* Wais.pod: Fixed typos.
 
-Fri Nov 10 15:53:26 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* t/dict.t: Patch to fix chat2 for solaris.
 
-. Description:
+	* ChangeLog Wais.xs: Fixed some parameter declarations which
+	  confused older xsupps.
 
-	Added dictionary.h and HTWAIS.h
+Thu Dec 28 16:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Added headline().
+	* dictionary.c: Casted result of strdup to make sure.
 
-	Moved extern definitions to HTWAIS.h. Include HTWAIS.h and
-	dictionary.h.
+	* Wais.pod: Tiny fixes.
 
+	* Wais.xs: Support for docids.	Support for init messages. Renamed
+	  database to database_name since some compilers are worried about
+	  types a variables having the same name.
 
-Fri Nov 10 08:56:51 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* typemap: Support for InitResponseAPDU.
 
-. Description:
+Thu Dec 28 09:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Added function postings() to access the inverted files.
+	* checkserver: ok? Vor parallel.
 
+Wed Dec 27 11:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Wed Nov  8 19:31:19 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* checkserver: Initial revision
 
-. Description:
+Wed Dec 13 14:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	'perl -w' now does not complain any more about uninitialized
-	value.
+	* Wais.pod: First try.
 
-	Test remote database also.
+Wed Dec 13 08:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-Wed Nov  8 16:16:10 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* MANIFEST: added typemap.
 
-. Description:
+	* ChangeLog: Works as expected.
 
-	Reorganized dictionary stuff completely.
+	* Wais.xs: Added CHARS_PER_PAGE.
 
-	Added TESTDB for tests. Tests use the FIELD-EXAMPLE/test
-	database in the freeWAIS-sf source directory.
+	* Makefile.PL: Added -noprototypes.
 
+	* Wais.pm: Added Retrieve().
 
-Wed Nov  8 09:22:27 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Tue Dec 12 17:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* t/parallel.t: Does not test parallel search yet. (Should be no
+	  problem anyway :-)
 
-	More standard Makefile.PL.
+Tue Dec 12 11:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	README now describes how to build outside the perl source tree.
+	* dictionary.c: sprinf fixes.
 
-	New functions dictionary and list_offset.
-	Code for examining local wais databases.
+	* ChangeLog Wais.pm Wais.xs: Parallel search works.
 
-Fri Sep 29 13:03:32 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Tue Dec 12 07:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* Wais.pm: First parallel version.
 
-	Interactive search for the freeWAIS-sf includes and
-	libraries. Also removed .../ctype/ctype.o. Make sure to
-	include it in libwais.a. This is done with freeWAIS-sf-2.0.19
-	automatically.
+Mon Dec 11 14:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Added README. It is just part of an article posted by Jonathan
-	K. Cohen.  No time to write myself :-(.
+	* newtest.pl: Jetzt wollen wir mal parallel suchen!
 
-Sun Sep 10 11:59:41 MET DST 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Fri Dec  8 19:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-. Description:
+	* Wais.xs: Added plenty of stuff for direct access to the
+	  Protokoll. When finished, parallel searching will be possisble.
+	  Currently only search works. But it can handle relevance-
+	  feedback. Document type currently is not availabe.
 
+	* ChangeLog: Parallel serach nearly works.
 
-	Passed HTWAIS.c trough gnu indent.
+	* newtest.pl: Searching with relevance feedback works. Documenttype
+	  "TEXT" is hardcoded for now.
 
-	Sun Sep 10 11:37:17 MET DST 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+	* Makefile.PL: 2beta1 conformant.
 
-. Description:
+Fri Dec  8 17:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
-	Test if the given freeWAIS-sf source directory exists and
-	query user if not.
+	* Wais.xs: Versuche mit connect in C. Scheitert and asyncroner IO.
 
-	Fixed include statements to work for freeWAIS-sf-2.0.
-	Ok with cc now.
+	* Wais.pm: Versuch mit open().
 
-	Added patchlevel.h to distribution.
+Fri Dec  8 09:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: Genung der rumprobiererei.
+
+Thu Dec  7 15:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: interpret_message, search_response, diagnostics.
+
+	* Wais.xs: Totel ende mit all? (2.1 ??)
+
+Thu Nov 16 12:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* inspect: Examin Wais databases in directories given on the
+	  command line. Needs Curses.
+
+	* dictionary.c: Added document. Fixed postings bug (did not
+	  allocate space on stack).
+
+	* ChangeLog: Added document(0 to retrieve documents of local
+	  databases.
+
+	* MANIFEST: Added inspect.
+
+	* Wais.pm Wais.xs dictionary.h t/dict.t: Added document.
+
+Tue Nov 14 14:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* dictionary.c: Added document (SV *)
+
+Fri Nov 10 16:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: Replaced magic variables. By real Variables. Added
+	  version.
+
+	* ChangeLog: Changed recsep, fldsep, maxdoc to normal perl
+	  variables.
+
+	* Wais.pm: Added version.
+
+	* HTWAIS.c: Replaced magic variables. By real Variables.
+
+Fri Nov 10 14:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.h dictionary.h: Extern definitions.
+
+	* t/dict.t: Added test for headline().
+
+	* HTWAIS.c: Moved extern definitions to HTWAIS.h. Include HTWAIS.h
+	  and dictionary.h.
+
+	* ChangeLog Wais.xs dictionary.c: Added headline().
+
+	* MANIFEST: Added dictionary.h and HTWAIS.h
+
+Fri Nov 10 07:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: Added postings().
+
+Thu Nov  9 20:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.pm Wais.xs dictionary.c t/dict.t: Added postings().
+
+Thu Nov  9 18:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* dictionary.c: Erster Versuch mit postings().
+
+Wed Nov  8 18:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: 'perl -w' now does not complain any more about
+	  uninitialized value.
+
+	* t/basic.t: Test remote database also.
+
+	* ChangeLog: added remote tests.
+
+Wed Nov  8 15:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL: Added TESTDB for tests.
+
+	* MANIFEST Wais.xs dictionary.c: Reorganized dictionary stuff
+	  completely.
+
+	* ChangeLog: Found a very tricky bug in freeWAIS this way :-(
+
+	* t/basic.t: Test the local database in the freeWAIS-sf soyrce
+	  directories.
+
+	* t/dict.t: Test the dictionary functiions.
+
+Wed Nov  8 08:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* README: Now describes how to build outside the perl source tree.
+
+	* Makefile.PL: More standard Makefile.PL.
+
+	* ChangeLog MANIFEST Wais.pm Wais.xs: New functions dictionary and
+	  list_offset.
+
+	* dictionary.c: Code for examining local wais databases.
+
+Tue Nov  7 15:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* dictionary.c: Versuch mit hash.
+
+Tue Nov  7 12:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* dictionary.c: Initial revision
+
+Fri Sep 29 12:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL: Interactive search for the freeWAIS-sf includes and
+	  libraries. Also removed .../ctype/ctype.o. Make sure to include
+	  it in libwais.a. This is done with freeWAIS-sf-2.0.19
+	  automatically.
+
+	* README: Just part of an article posted by Jonathan K. Cohen. No
+	  time to write myself :-(.
+
+	* MANIFEST: Added README.
+
+Sun Sep 10 09:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST: Added patchlevel.h
+
+	* Makefile.PL: Test if the given freeWAIS-sf source directory
+	  exists and query user if not.
+
+	* MANIFEST: Added ChangeLog
+
+	* HTWAIS.c: Passed trough gnu indent.
+
+	* ChangeLog: -
+
+	* HTWAIS.c: Fixed include statements to work for freeWAIS-sf-2.0.
+	  Ok with cc now.
+
+Sun Sep 10 08:00:00 1995 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c MANIFEST Makefile.PL Wais.pm Wais.xs test.pl: Pat
+	  baseline
+
+Wed Nov  2 14:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c Wais.xs test.pl: funktioniert nicht so ganz
+
+Wed Nov  2 09:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile Makefile.PL Wais.bs Wais.pm Wais.xs test.pl:
+	  Sicherung vor RelevanceFeedback
+
+Mon Oct 24 11:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: ok.
+
+	* MANIFEST Makefile.PL test.pl: Initial revision
+
+	* Wais.pm Wais.xs: 0.1
+
+Mon Oct 24 10:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.SH Wais.bs Wais.pm: Initial revision
+
+	* HTWAIS.c Wais.xs: Sicherung vor h2xs
+
+Mon Aug  8 18:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: Compilierbar!
+
+Mon Aug  8 16:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Wais.xs: Initial revision
+
+	* HTWAIS.c: perl4
+
+Wed Jun 22 15:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* query.pl: Initial revision
+
+Wed Jun 22 11:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: added local search
+
+Tue Jun 21 15:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: Sicherung vor LOCAL_SEARCH
+
+Fri Jun 17 07:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: Funktioniert soweit.
+
+Thu Jun 16 10:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile: Initial revision
+
+Thu Jun 16 08:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: connect funktioniert wahrscheinlich.
+
+Thu Jun 16 07:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: connect is immer noch mist
+
+Thu Jun 16 06:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: Sicherung
+
+Wed Jun 15 19:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: sicherung vor eibau weitere sourcen
+
+Wed Jun 15 14:00:00 1994 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* HTWAIS.c: Initial revision
 

@@ -6,15 +6,24 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon Feb  3 16:34:43 1997
+# Last Modified On: Thu Feb 13 13:28:39 1997
 # Language        : Perl
-# Update Count    : 196
+# Update Count    : 199
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
-# $Locker: pfeifer $
+# $Locker:  $
 # $Log: Makefile.PL,v $
+# Revision 2.6  1997/02/13 12:29:31  pfeifer
+# Bad passing of PREOP
+#
+# Revision 2.4  1997/02/06 09:43:02  pfeifer
+# remove inspect upon "make clean"
+#
+# Revision 2.3  1997/02/06 09:34:45  pfeifer
+# Switched to CVS
+#
 #
 
 use ExtUtils::MakeMaker;
@@ -87,11 +96,15 @@ rewrite('Wais.pm', 'Wais', $VERSION);
    'OBJECT'         => "Wais.o HTWAIS.o dictionary.o $OBJECT",
    'DEFINE'         => '-DTRACE=0 -g',
    'PL_FILES'       => {'inspect.PL' => 'inspect'},
-   'dist'           => { SUFFIX => 'gz', COMPRESS => 'gzip -f' },
-   'clean' 	    => {'FILES' => '*~ Wais.h'},
+   'dist'           => { SUFFIX   => 'gz',
+                         COMPRESS => 'gzip -9f',
+                         'PREOP'  => 'changelog -update',
+                       },
+   'clean' 	    => {'FILES' => '*~ Wais.h inspect'},
    'MAP_TARGET'     => 'waisperl',
    'EXE_FILES'      => [ 'inspect' ],
-);
+   
+  );
 
 sub getversion {
     my $file = shift;

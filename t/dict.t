@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Sun Apr 21 23:23:00 1996
+# Last Modified On: Tue Nov 26 13:19:33 1996
 # Language        : Perl
-# Update Count    : 67
+# Update Count    : 68
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: dict.t,v $
+# Revision 2.2  1996/08/19 17:15:20  pfeifer
+# perl5.003
+#
 # Revision 2.1.1.5  1996/04/30 07:51:07  pfeifer
 # patch9: Test now hides a bug(?). On solaris one get the results as
 # patch9: before. On sunos the DICTIONARY_TOTAL_SIZE_WORD is also
@@ -64,7 +67,6 @@ while (<MF>) {
 close(MF);
 die "Which db?" unless $db;
 
-use lib '.';
 use Wais;
 
 $should = 'pollmann,1,poersch,2,pfeifer,10,pennekamp,1,p622,2,p525,1,p455,1,p116,10';

@@ -42,6 +42,9 @@ eval 'exec perl -S $0 "$@"'
 # 
 # $Locker: pfeifer $
 # $Log: inspect.PL,v $
+# Revision 2.2  1996/08/19 17:15:20  pfeifer
+# perl5.003
+#
 # Revision 2.1.1.1  1996/04/30 07:45:18  pfeifer
 # patch9: Now mainly uses the perl dictionary functions in Wais::Dict
 # patch9: which seem more stable. than the XS equivalents. Can handle

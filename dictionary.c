@@ -4,15 +4,18 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu Dec 28 17:30:47 1995
+ * Last Modified On: Tue Nov 26 13:44:48 1996
  * Language        : C
- * Update Count    : 193
+ * Update Count    : 210
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.c,v $
+ * Revision 2.2  1996/08/19 17:15:20  pfeifer
+ * perl5.003
+ *
  * Revision 2.1.1.1  1995/12/28 16:31:39  pfeifer
  * patch1: Casted result of strdup to make sure.
  *
@@ -268,6 +271,11 @@ postings (database_name, field, word, number_of_postings)
     stream = db->field_index_streams[pick_up_field_id (field, db)];
   else
     stream = db->index_stream;
+#ifdef WAIS_USES_STDIO
+#ifdef fseek
+#undef fseek
+#endif
+#endif
 
   if (0 != fseek (stream, (long) index_file_block_number,
 		  SEEK_SET)) {
@@ -331,7 +339,7 @@ postings (database_name, field, word, number_of_postings)
       AV*             POST = (AV*)sv_2mortal((SV *)newAV());
       did = read_bytes_from_memory (DOCUMENT_ID_SIZE,
 				    posting_list + posting_list_pos);
-#ifdef LITTLEENDIAN
+#if (BYTEORDER & 0xffff) == 0x1234
       char_list_size =
 	htonl (read_bytes_from_memory (NUMBER_OF_OCCURANCES_SIZE,
 				       posting_list +
@@ -492,8 +500,15 @@ document (database_name, docid)
   if (NULL == buf) {
     W_ERROR ("Out of memory", 0);
   }
+#ifdef WAIS_USES_STDIO
+#ifdef fread
+#undef fread
+#endif
   bytesRead = fread ((void *) buf, (size_t) sizeof (char),
-		     length, input_stream);
+ 		     length, input_stream);
+#else
+  bytesRead = PerlIO_read (input_stream, (void *) buf, length);
+#endif
 
   if (bytesRead != length) {
     W_ERROR ("Could not read document completely %d", length-bytesRead);

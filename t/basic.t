@@ -14,6 +14,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: basic.t,v $
+# Revision 2.2  1996/08/19 17:15:20  pfeifer
+# perl5.003
+#
 # Revision 2.1.1.3  1996/07/16 16:40:41  pfeifer
 # patch10:
 #
@@ -34,7 +37,7 @@
 # patch6: Test the local database in the freeWAIS-sf soyrce directories.
 #
 # 
-use lib '.';
+
 use Wais;
 
 open(MF, "Makefile") || die "could not open Makefile: $!";

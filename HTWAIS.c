@@ -5,9 +5,9 @@
  * Author          : Brewster Kahle, Thinking Machines, <Brewster@think.com>
  * Created On      : Wed Jun 15 17:07:41 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Mon Jul  1 17:31:48 1996
+ * Last Modified On: Tue Nov 26 13:37:45 1996
  * Language        : C
- * Update Count    : 208
+ * Update Count    : 214
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -16,6 +16,9 @@
  * 
  * $Locker: pfeifer $
  * $Log: HTWAIS.c,v $
+ * Revision 2.2  1996/08/19 17:15:20  pfeifer
+ * perl5.003
+ *
  * Revision 2.1.1.1  1996/07/16 16:32:39  pfeifer
  * patch10: Modified for building from installed freeWAIS-sf libraries
  * patch10: and include files.
@@ -826,6 +829,11 @@ WAISsearch (host, port, wais_database, keywords,
         fprintf (stderr, "===WAIS=== connection failed\n");
       return -1;
     }
+#ifdef WAIS_USES_STDIO
+#ifdef fdopen
+#undef fdopen
+#endif
+#endif
     if ((connection = fdopen (fd, "r+")) == NULL) {
       if (TRACE)
         fprintf (stderr,
@@ -881,6 +889,11 @@ WAISsearch (host, port, wais_database, keywords,
     }
   }
   if (connection)
+#ifdef WAIS_USES_STDIO
+#ifdef fclose
+#undef fclose
+#endif
+#endif
     fclose (connection);
   s_free (request_message);
   s_free (response_message);

@@ -4,9 +4,9 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu Aug 15 19:28:39 1996
+ * Last Modified On: Thu Oct 17 15:41:28 1996
  * Language        : C
- * Update Count    : 393
+ * Update Count    : 394
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -125,6 +125,9 @@ init_Wais()
 }
                 
 MODULE = Wais PACKAGE = Wais
+
+PROTOTYPES: ENABLE
+
 BOOT:
 init_Wais();
 

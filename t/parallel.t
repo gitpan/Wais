@@ -14,6 +14,10 @@
 # 
 # $Locker: pfeifer $
 # $Log: parallel.t,v $
+# Revision 2.1.1.7  1996/08/01 18:13:31  pfeifer
+# patch14: Added use lib '.' to make it find chat2.pl in current
+# patch14: directory.
+#
 # Revision 2.1.1.6  1996/07/16 16:41:10  pfeifer
 # patch10: Made test al little sloppier ;-)
 #

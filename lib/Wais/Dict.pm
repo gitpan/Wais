@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu Jul 18 11:44:18 1996
+# Last Modified On: Mon Aug  5 13:52:20 1996
 # Language        : Perl
-# Update Count    : 65
+# Update Count    : 96
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Dict.pm,v $
+# Revision 2.1.1.4  1996/08/01 18:11:58  pfeifer
+# patch14: Some fixes to make 'perl -w' happy.
+#
 # Revision 2.1.1.3  1996/07/22 15:40:54  pfeifer
 # patch13:
 # patch13: Fix from Norbert Goevert.
@@ -35,7 +38,7 @@ use vars qw($VERSION);
 {
   my $Revision = '';
   
-  $VERSION = join '', q$Revision: 2.1.1.3 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+  $VERSION = join '', q$Revision: 2.1.1.4 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
 }
 use Carp;
 use FileHandle;
@@ -48,10 +51,10 @@ sub cmp {
   my ($cx, $cy) = @_;
   
   # $x is empty. If $y is not empty, it is larger
-  return (length($cy))?-1:0 unless length($cx);
+  return (length($cy))?-1:0 unless defined $cy and length($cx);
   
   # $x is not empty, $y is empty
-  return 1 unless length($cy);
+  return 1 unless defined $cy and length($cy);
   
   (ord($cx) <=> ord($cy))       # test the  first character
     || 
@@ -75,7 +78,7 @@ sub TIEHASH {
     unless ($fh->open("< $file")) {
         croak "Could not open $file: $!";
     }
-    my $buf;
+    my $buf = '';
     read($$fh,$buf,4) || croak "Could not read header: $!";
     my ($magic, $blk) = unpack 'SS', $buf;
     croak "$file is no dictionary file" if $magic != 0;
@@ -100,11 +103,11 @@ sub FETCH {
     my $op     = shift;
     my $result;
 
-    if ($self->{KEY} eq $term) {
+    if (defined $self->{KEY} and $self->{KEY} eq $term) {
         $result = $self->{VALUE};
         return (($op)?$result->[0]:$result->[1]);
     } else {
-        my ($blk, $ble);
+        my ($blk, $ble) = (0,0);
         # try the first entries  of each block
         for (@{$self->{DA}}) {
             if (&cmp($_,$term) != 1) { # $_ le $term:
@@ -134,7 +137,7 @@ sub binsearch {
 
     if ($left + 29 > $right) {  # intervall collapsed
         ($fterm,$ptr, $occ) = &getterm($fh, $left);
-        if ($term eq $fterm) {  # hit
+        if (defined $fterm and $term eq $fterm) {  # hit
             return [$ptr, $occ] ;
         } else {
           my $cmp = &cmp($term, $fterm);
@@ -145,7 +148,7 @@ sub binsearch {
         my $mid = $left + int(($right-$left)/2/29)*29;
         ($fterm,$ptr, $occ) = &getterm($fh, $mid);
         my $cmp;
-        unless (length($fterm)) {
+        unless (defined $fterm and length($fterm)) {
             $cmp = -1;          # $fterm after end of dictionary
         } else {
             $cmp = &cmp($term, $fterm);
@@ -164,9 +167,9 @@ sub binsearch {
 sub getterm {
     my ($fh,$offset) = @_;
 
-    $fh->seek($offset,0);
-    my $buf;
-    read($$fh,$buf,29) || return undef;
+    $fh->seek($offset,0) or return undef;
+    my $buf = '';               # perl -w
+    read($$fh,$buf,29)==29 or return undef;
     unpack 'A21 I I', $buf;
 }
 
@@ -180,7 +183,7 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     my $self = shift;
-    my $buf;
+    my $buf  = '';
     my $fh   = $self->{FH};
 
     read($$fh,$buf,29) || return undef;
@@ -196,7 +199,7 @@ sub NEXTKEY {
 
 sub PREVKEY {
     my $self = shift;
-    my $buf;
+    my $buf  = '';
     my $fh   = $self->{FH};
 
     $self->{FH}->seek(-29,1)         || return undef;
@@ -265,7 +268,8 @@ sub POSTINGS {
     }
   }
   $fh->seek($offset,0) || confess "could not seek: $!\n";
-  my ($buf, $flag,$npo,$size,$did,$bsize,$weight,$ch,$cl,$charpos);
+  my ($flag,$npo,$size,$did,$bsize,$weight,$ch,$cl,$charpos);
+  my $buf = '';
   read($$fh,$buf,9);
   ($flag,$npo,$size) = unpack 'aII', $buf;
   return unless $size;

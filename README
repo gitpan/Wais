@@ -1,3 +1,24 @@
+Thu Aug  1 20:15:26 MET DST 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch14:
+
+Makefile.PL
+	Source building method now includes 'ctype.o' if found.
+	This should help people with freeWAIS-sf distributions which 
+	do not include it in libwais.a (i.e. all current public availabe 
+        versions. 
+t/
+	Added new test fro Dict.pm.
+
+t/parallel.t
+	Added use lib '.' to make it find chat2.pl in current
+	directory.
+
+lib/Wais/Dict.pm
+        Some fixes to make 'perl -w' happy.
+
+
+------------------------------------------------------------------------
 For installation you need a installed perl5. I used perl5.001n and
 perl5.002.  Also you need the freeWAIS-sf-2.0 distribution with
 patchlevel >= 46. 

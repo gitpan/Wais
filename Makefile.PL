@@ -6,15 +6,20 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Tue Jul 16 18:50:35 1996
+# Last Modified On: Mon Aug  5 13:43:24 1996
 # Language        : Perl
-# Update Count    : 155
+# Update Count    : 176
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Makefile.PL,v $
+# Revision 2.1.1.8  1996/08/01 18:10:00  pfeifer
+# patch14: Source building method now includes 'ctype.o' if found.
+# patch14: This should help people with freeWAIS-sf distributions which
+# patch14: do not include it in libwais.a.
+#
 # Revision 2.1.1.7  1996/07/22 15:38:13  pfeifer
 # patch13: Added AP prototype to Wais.h
 #
@@ -68,7 +73,7 @@ use ExtUtils::MakeMaker;
 use Config;
 
 # when compiling with the freeWAIS-sf source directory
-$FW      = "/usr/local/ls6/src+data/src/freeWAIS-sf-2.0";
+$FW      = "/usr/local/ls6/src+data/src/freeWAIS-sf-2.1.1";
 
 # when compiling with the installed freeWAIS-sf 
 $TESTDB  = "$FW/FIELD-EXAMPLE/test";
@@ -96,9 +101,15 @@ if (!$NOSRC and $FW) {
         $regexp = "-lregexp";
       }
   }
-  $LDFLAGS = "-L$FW/ir -L$FW/regexp -L$FW/lib";
-  $CFLAGS  = "-I$FW/ir";
   close(CONF);
+  if (-e "$FW/ctype/ctype.o") {
+    $OBJECT = "$FW/ctype/ctype.o";
+  } else {
+    print STDERR "I do not see '$FW/ctype/ctype.o'\n";
+    print STDERR "Assuming that's in linwais.a.\n";
+  }
+  $LDFLAGS  = "-L$FW/ir -L$FW/regexp -L$FW/lib";
+  $CFLAGS   = "-I$FW/ir";
 } else {
   print STDERR "Could not locate the freeWAIS-sf source directory.\n";
   print STDERR "Assume that you generated 'wais.h'. See README for details.\n";
@@ -122,9 +133,11 @@ rewrite('lib/Wais.pm', 'Wais', $VERSION);
 	'INC'            => $CFLAGS,
 	'NAME'           => 'Wais',
 	'VERSION'        => $VERSION,
-	'OBJECT'         => "Wais.o HTWAIS.o dictionary.o",
+	'OBJECT'         => "Wais.o HTWAIS.o dictionary.o $OBJECT",
 	'DEFINE'         => '-DTRACE=0 -g',
         'XSPROTOARG'     => '-noprototypes', 
+        'PL_FILES'       => {'chat2.pl.PL' => 'chat2.pl',
+                             'inspect.PL' => 'inspect'},
         'dist'           => { SUFFIX => 'gz', COMPRESS => 'gzip -f' },
         'clean' 	 => {'FILES' => '*~ chat2.pl Wais.h'},
         'MAP_TARGET'     => 'waisperl',
@@ -190,6 +203,9 @@ sub write_include {
     print INC "#include <wais.h>\n";
   } else {
     print INC q[
+#ifdef Uid_t
+#undef Uid_t
+#endif
 #include <ui.h>
 #include "dictionary.h"
 #include <cutil.h>

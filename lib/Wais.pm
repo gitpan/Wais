@@ -4,15 +4,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 08:55:26 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon Jul 22 17:48:36 1996
+# Last Modified On: Mon Aug  5 18:17:12 1996
 # Language        : Perl
-# Update Count    : 107
+# Update Count    : 109
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Wais.pm,v $
+# Revision 2.1.1.7  1996/08/01 18:11:40  pfeifer
+# patch14:
+#
 # Revision 2.1.1.6  1996/07/22 15:40:36  pfeifer
 # patch13:
 #
@@ -51,7 +54,7 @@ $maxnumfd = 10;
 
 # Preloaded methods go here.
 
-$Wais::VERSION = 2.113;
+$Wais::VERSION = 2.114;
 bootstrap Wais $VERSION;
 require 'chat2.pl';
 
@@ -205,7 +208,6 @@ sub Retrieve {
     my ($fh, $length);
     my $apdu; 
     my $result   = new Wais::Result('type' => $type);
-    my $chunk = 0;
     my $presult;
 
     if (($host eq 'localhost') && (-e "$database.src")) {
@@ -241,7 +243,7 @@ use vars qw($VERSION);
 {
   my $Revision = '';
   
-  $VERSION = join '', q$Revision: 2.1.1.6 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+  $VERSION = join '', q$Revision: 2.1.1.7 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
 }
 sub new {
     my $type = shift;

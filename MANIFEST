@@ -6,7 +6,6 @@ Makefile.PL
 README
 Wais.pod                     Some documentation for the curious.
 Wais.xs
-chat2.pl.PL		     Autoextracting chat2.pl replacement.
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
 inspect.PL                   Example script for exploring wais databases.

@@ -5,9 +5,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Wed Aug  7 23:11:17 1996
+# Last Modified On: Thu Oct 17 15:40:08 1996
 # Language        : Perl
-# Update Count    : 106
+# Update Count    : 108
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
@@ -85,6 +85,11 @@ sub TIEHASH {
     read($$fh,$buf,4) || croak "Could not read header: $!";
     my ($magic, $blk) = unpack 'Sn', $buf;
     croak "$file is no dictionary file" if $magic != 0;
+    # older versions of freewais-sf seem to have wrong blk??
+    # we use the file size to compute blk.
+    my $sblk = (((-s $file)-2)/29);
+    $blk = $sblk % 1000 if $sblk = int($sblk);
+    
     my (%dir, @dir);
     $self->{FI} = 4+29*$blk;
     while ($blk-->0) {

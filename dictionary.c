@@ -4,15 +4,18 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Thu Dec 28 17:30:47 1995
+ * Last Modified On: Wed Sep  4 20:23:09 1996
  * Language        : C
- * Update Count    : 193
+ * Update Count    : 194
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.c,v $
+ * Revision 2.2  1996/08/19 17:15:20  pfeifer
+ * perl5.003
+ *
  * Revision 2.1.1.1  1995/12/28 16:31:39  pfeifer
  * patch1: Casted result of strdup to make sure.
  *
@@ -331,7 +334,7 @@ postings (database_name, field, word, number_of_postings)
       AV*             POST = (AV*)sv_2mortal((SV *)newAV());
       did = read_bytes_from_memory (DOCUMENT_ID_SIZE,
 				    posting_list + posting_list_pos);
-#ifdef LITTLEENDIAN
+#if (BYTEORDER & 0xffff) == 0x1234
       char_list_size =
 	htonl (read_bytes_from_memory (NUMBER_OF_OCCURANCES_SIZE,
 				       posting_list +

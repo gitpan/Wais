@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Nov 10 15:50:04 1995
+# Last Modified On: Tue Nov 14 13:51:01 1995
 # Language        : Perl
-# Update Count    : 36
+# Update Count    : 38
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: dict.t,v $
+# Revision 2.0.1.4  1995/11/16  12:23:25  pfeifer
+# patch11: Added document.
+#
 # Revision 2.0.1.3  1995/11/10  14:52:29  pfeifer
 # patch9: Added test for headline().
 #
@@ -36,7 +39,7 @@ close(MF);
 
 use Wais;
 
-print "1..7\n";
+print "1..8\n";
 
 $should = 'pollmann,1,poersch,2,pfeifer,10,pennekamp,1,p622,2,p525,1,p455,1,p116,10';
 $result = join ',', &Wais::dictionary($db , 'au', 'p*');
@@ -63,3 +66,8 @@ print (($#{$x{1}} == 2)?"ok 6\n" : "not ok 6\n");
 $should = '1991 Fuhr, N.; Pfeifer, U Combining Model-Oriented and Description';
 $result = &Wais::headline($db,1);
 print (($should eq $result)?"ok 7\n" : "not ok 7\n");
+
+$should = 'Combining Model-Oriented and Description';
+$result = &Wais::document($db,1);
+print (($result =~ $should)?"ok 8\n" : "not ok 8\n");
+

@@ -4,15 +4,22 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Fri Nov 10 15:41:13 1995
+ * Last Modified On: Wed Nov 15 11:39:50 1995
  * Language        : C
- * Update Count    : 160
+ * Update Count    : 177
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.c,v $
+ * Revision 2.0.1.7  1995/11/16  12:23:48  pfeifer
+ * patch11: Added document.
+ * patch11: Fixed postings bug (did not allocate space on stack).
+ *
+ * Revision 2.0.1.6  1995/11/14  14:52:52  pfeifer
+ * patch11: Added document (SV *)
+ *
  * Revision 2.0.1.5  1995/11/10  14:52:38  pfeifer
  * patch9: Added headline().
  *
@@ -306,7 +313,7 @@ postings (database_name, field, word, number_of_postings)
 		not_full_flag);
       return (0);
     }
-
+    EXTEND (sp, number_of_valid_entries*2);
     for (count = 0; count < number_of_valid_entries; count++) {
       int             wgt = 0;
       int             did;
@@ -409,4 +416,80 @@ headline(database_name, docid)
       }
       disposeDatabase (db);
       return(result);
+}
+#undef  W_ERROR
+#define W_ERROR(M,V) \
+{\
+        char           buff[80];\
+        SV             *error = perl_get_sv ("Wais::errmsg", TRUE);\
+\
+        if (db) disposeDatabase (db);\
+        if (input_stream != NULL) s_fclose(input_stream);\
+        if (buf != NULL)  s_free (buf);\
+        return (0);\
+}
+
+char           *
+document (database_name, docid)
+     char           *database_name;
+     long            docid;
+{
+  char           *fna[1];
+  char           *buf;
+  database       *db;
+  document_table_entry doc_entry;
+  char            filename[MAX_FILE_NAME_LEN];
+  char            *tmpFileName;
+  char            type[100];
+  FILE           *input_stream = NULL;
+  long            length, bytesRead;
+
+  fna[0] = NULL;
+  if ((db = open_database (database_name, fna, 0)) == NULL) {
+    return (0);
+  }
+  if (read_document_table_entry (&doc_entry, docid, db)
+      != true) {
+    W_ERROR ("Cuold not read document table entry", 0);
+  }
+  read_filename_table_entry (doc_entry.filename_id,
+			     filename,
+			     type,
+			     NULL,
+			     db);
+  if (probe_file (filename)) {
+    input_stream = s_fopen (filename, "r");
+  } else {
+    if (probe_file_possibly_compressed (filename)) {
+      tmpFileName = s_fzcat (filename);
+      if (tmpFileName) {
+	input_stream = s_fopen (tmpFileName, "r");
+	unlink (tmpFileName);
+	free (tmpFileName);
+      }
+    } else {
+      W_ERROR ("File %s not readable", filename);
+    }
+  }
+
+  if (NULL == input_stream) {
+    W_ERROR ("File %s does not exist", filename);
+  }
+  if (fseek (input_stream, doc_entry.start_character, SEEK_SET) != 0) {
+    W_ERROR ("retrieval can't seek to %ld", doc_entry.start_character);
+  }
+  length = doc_entry.end_character - doc_entry.start_character;
+  buf = (char *)s_malloc (sizeof(char) *length);
+  if (NULL == buf) {
+    W_ERROR ("Out of memory", 0);
+  }
+  bytesRead = fread ((void *) buf, (size_t) sizeof (char),
+		     length, input_stream);
+
+  if (bytesRead != length) {
+    W_ERROR ("Could not read document completely %d", length-bytesRead);
+  }
+  disposeDatabase (db);
+  s_fclose (input_stream);
+  return (buf);
 }

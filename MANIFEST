@@ -11,3 +11,4 @@ README
 ChangeLog                    Added ChangeLog
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
+inspect                      Example script for exploring wais databases.

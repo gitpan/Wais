@@ -1,3 +1,16 @@
+Thu Nov 16 13:25:34 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Added document (SV *)
+
+	Added inspect: Examin Wais databases in directories given on
+	the command line. Needs Curses.
+
+	Fixed postings bug (did not allocate space on stack).
+
+	
+
 Fri Nov 10 17:24:59 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 . Description:

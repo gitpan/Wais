@@ -4,8 +4,8 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Aug  8 16:09:45 1994
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Fri Nov 10 17:11:40 1995
- * Update Count    : 143
+ * Last Modified On: Tue Nov 14 15:58:30 1995
+ * Update Count    : 148
  * Status          : Unknown, Use with caution!
  */
 
@@ -246,4 +246,13 @@ headline(database,docid)
 	char *	database;
 	long	docid;
 
-	
+char *
+document(database,docid)
+	char *	database;
+	long	docid;
+CODE:
+        RETVAL=document(database,docid);
+        ST(0) = sv_newmortal();
+        sv_setpv((SV*)ST(0), RETVAL);
+        s_free(RETVAL);
+

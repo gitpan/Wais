@@ -1,30 +1,7 @@
-#!/bin/perl
+#!/app/unido-i06/share/lang/perl/5.00469/bin/perl
 
-use Config;
-use File::Basename qw(&basename &dirname);
-
-# List explicitly here the variables you want Configure to
-# generate.  Metaconfig only looks for shell variables, so you
-# have to mention them as if they were shell variables, not
-# %Config entries.  Thus you write
-#  $startperl
-# to ensure Configure will look for $Config{startperl}.
-
-# This forces PL files to create target in same directory as PL file.
-# This is so that make depend always knows where to find PL derivatives.
-chdir(dirname($0));
-($file = basename($0)) =~ s/\.PL$//;
-$file =~ s/\.pl$//
-	if ($^O eq 'VMS' or $^O eq 'os2');  # "case-forgiving"
-
-open OUT,">$file" or die "Can't create $file: $!";
-
-print "Extracting $file (with variable substitutions)\n";
-
-print OUT <<"!GROK!THIS!";
-$Config{'startperl'}
-!GROK!THIS!
-print OUT <<'!NO!SUBS!';
+eval 'exec /app/unido-i06/share/lang/perl/5.00469/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 eval 'exec perl -S $0 "$@"'
     if 0;
 #                              -*- Mode: Perl -*- 
@@ -435,8 +412,3 @@ Ulrich Pfeifer F<E<lt>pfeifer@ls6.cs.uni-dortmund.deE<gt>>,
 =cut
 
 
-!NO!SUBS!
-close OUT or die "Can't close $file: $!";
-chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
-  

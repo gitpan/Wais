@@ -4,10 +4,10 @@
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
-# Last Modified By: Ulrich Pfeifer
-# Last Modified On: Thu May  1 14:22:32 1997
+# Last Modified By: Norbert Goevert
+# Last Modified On: Mon Jul 13 17:29:31 1998
 # Language        : Perl
-# Update Count    : 70
+# Update Count    : 71
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -17,7 +17,7 @@ BEGIN {print "1..8\n";}
 
 use Wais;
 
-$db     = 'test/test';
+$db     = 't/data/test';
 $should = 'pollmann,1,poersch,2,pfeifer,10,pennekamp,1,p622,2,p525,1,p455,1,p116,10';
 $result = join ',', &Wais::dictionary($db , 'au', 'p*');
 print (($should eq $result)?"ok 1\n" : "not ok 1\n");

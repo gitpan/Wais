@@ -4,9 +4,9 @@
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Jun  7 17:45:45 1994
-# Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Feb 14 14:41:35 1997
-# Update Count    : 151
+# Last Modified By: Norbert Goevert
+# Last Modified On: Mon Jul 13 17:26:54 1998
+# Update Count    : 165
 # Status          : Unknown, Use with caution!
 # 
 # 
@@ -44,41 +44,59 @@
 # patch6: Test the local database in the freeWAIS-sf soyrce directories.
 #
 # 
-BEGIN {print "1..4\n";}
+
+
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl t/catalog.t'
+
+######################### We start with some black magic to print on failure.
+
+# Change 1..1 below to 1..last_test_to_print .
+# (It may become useful if the test is moved to ./t subdirectory.)
+
+BEGIN { $| = 1; print "1..5\n"; }
+END {print "not ok 1\n" unless $loaded;}
 use Wais;
+$loaded = 1;
+print "ok 1\n";
 
-my $db = 'test/test';
+######################### End of black magic.
 
-$query    = 'au=(fuhr and pfeifer)';
-$ti       = 'Probabilistic  Learning Approaches for Indexing and Retrieval';
-$lines    = 0;
-$score    = 0;
-$headline = '';
-$diag     = '';
-$headl    = '';
-$text     = '';
+# Insert your test code below (better if it prints "ok 13"
+# (correspondingly "not ok 13") depending on the success of chunk 13
+# of the test code):
 
-$WAISrecsep = &Wais::recsep("\000");
-$WAISfldsep = &Wais::fldsep("\001");
 
-($headl, $diag) = &Wais::search($db, $query);
-@docs = split(/$WAISrecsep/, $headl);
-print (($#docs == 6)?"ok 1\n" : "not ok 1\n");
+use strict;
 
-($score,$lines,$docid,$headline) = split(/$WAISfldsep/,pop @docs);
-($text,$diag) = &Wais::retrieve($db, $docid);
-print (($text =~ /$ti/)?"ok 2\n" : "not ok 2\n");
+my $db = 't/data/test';
 
-$host     = 'localhost';
-$port     = 4171;
-$db       = 'test';
-$query    = 'au=pennekamp';
-($headl, $diag) = &Wais::search($db, $query, $host,$port);
-@docs = split($WAISrecsep, $headl);
-print (($#docs == 0)?"ok 3\n" : "not ok 3\n");
+my $query = 'au=(fuhr and pfeifer)';
+my $ti    = 'Probabilistic  Learning Approaches for Indexing and Retrieval';
+
+my $WAISrecsep = &Wais::recsep("\000");
+my $WAISfldsep = &Wais::fldsep("\001");
+
+my($headl, $diag) = &Wais::search($db, $query);
+my @docs = split /$WAISrecsep/, $headl;
+print @docs == 7 ? "ok 2\n" : "not ok 2\n";
+
+my($score, $lines, $docid, $headline) = split /$WAISfldsep/, pop @docs;
+my $text;
+($text, $diag) = &Wais::retrieve($db, $docid);
+print $text =~ /$ti/ ? "ok 3\n" : "not ok 3\n";
+
+my $host = 'localhost';
+my $port = 4171;
+$db      = 'test';
+$query   = 'au=pennekamp';
+($headl, $diag) = &Wais::search($db, $query, $host, $port);
+@docs = split $WAISrecsep, $headl;
+print @docs == 1 ? "ok 4\n" : "not ok 4\n";
 
 $ti = 'Incremental Processing of Vague Queries';
-($score,$lines,$docid,$headline) = split(/$WAISfldsep/,pop @docs);
-($text,$diag) = &Wais::retrieve($db, $docid, $host,$port);
-print (($text =~ /$ti/)?"ok 4\n" : "not ok 4\n$text\n");
+
+($score, $lines, $docid, $headline) = split /$WAISfldsep/, pop @docs;
+($text, $diag) = &Wais::retrieve($db, $docid, $host, $port);
+print $text =~ /$ti/ ? "ok 5\n" : "not ok 5\n$text\n";
 

@@ -25,7 +25,6 @@ DESCRIPTION
               A bunch of XS functions useful for inspecting local
               databases.
 
-
     We will start with the SFgate 5 functions.
 
 USAGE
@@ -63,7 +62,6 @@ USAGE
                                           {'query'    => 'pfeifer', 
                                            'database' => $db2});
 
-
               If *host* is `'localhost'' and *database*`.src'
               exists, local search is performed instead of
               connecting a server.
@@ -82,7 +80,6 @@ USAGE
                                                'host'     => 'ls6',
                                                'type'     => 'TEXT');
 
-
               Defaults are the same as for `Wais::Search'. In
               addition type defaults to `'TEXT''.
 
@@ -96,45 +93,40 @@ USAGE
                         element (if any) is a reference to an array
                         consisting of
 
-                   tag                 The tag of the corresponding
+              tag                      The tag of the corresponding
                                        search request or
                                        `'document'' if the request
                                        was a retrieve request.
 
-                   code                The WAIS diagnostic code.
+              code                     The WAIS diagnostic code.
 
-                   message             A textual diagnostic message.
-
+              message                  A textual diagnostic message.
 
     header              Returns and array of WAIS document headers. Each
                         element (if any) is a reference to an array
                         consisting of
 
-                   tag                 The tag of the corresponding
+              tag                      The tag of the corresponding
                                        search request or
                                        `'document'' if the request
                                        was a retrieve request.
 
-                   score
-
-                   lines               Length of the corresponding
+              score
+              lines                    Length of the corresponding
                                        dcoument in lines.
 
-                   length              Length of the corresponding
+              length                   Length of the corresponding
                                        document in bytes.
 
-                   headline
-
-                   types               A reference to an array of types
+              headline
+              types                    A reference to an array of types
                                        valid for docid.
 
-                   docid               A reference to the WAIS
+              docid                    A reference to the WAIS
                                        identifier blessed into
                                        `Wais::Docid'.
 
-
     text                Returns the text fetched by `Wais::Retrieve'.
-
 
 Dictionary
               There are a couple of functions to inspect local
@@ -148,7 +140,6 @@ Dictionary
                      %frequency = Wais::dictionary($database, $field);
                      %frequency = Wais::dictionary($database, 'foo*');
                      %frequency = Wais::dictionary($database,  $field, 'foo*');
-
 
               The function returns an array containing alternating
               the matching words in the global or field dictionary
@@ -168,7 +159,6 @@ Dictionary
                      %postings = Wais::postings($database, 'foo');
                      %postings = Wais::postings($database, $field, 'foo');
 
-
               Returns and an array containing alternating numeric
               document id's and a reference to an array whichs first
               element is the internal weight if the word with
@@ -185,14 +175,12 @@ Dictionary
 
                      $headline = Wais::headline($database, $docid);
 
-
               The function retrieves the headline (only the text!)
               of the document numbered `$docid'.
 
   Wais::document
 
                      $text = &Wais::document($database, $docid);
-
 
               The function retrieves the text of the document
               numbered `$docid'.
@@ -203,7 +191,6 @@ Protocol
                      $apdu = Wais::generate_search_apdu($query,$database);
                      $relevant = [$id1, 'TEXT', $id2, 'HTML'];
                      $apdu = Wais::generate_search_apdu($query,$database,$relevant);
-
 
               Document id's must be of type `WAIS::Docid' as
               returned by `Wais::Result::header' or
@@ -216,7 +203,6 @@ Protocol
                      $apdu = Wais::generate_retrieval_apdu($database, $docid, 
                                                            $type, $chunk);
 
-
               Request to send the `$chunk''s chunk of the document
               whichs id is `$docid' (must be of type `WAIS::Docid').
               $chunk defaults to `0'. $Wais::CHARS_PER_PAGE may be
@@ -226,7 +212,6 @@ Protocol
 
                      $answer = Wais::local_answer($apdu);
 
-
               Answer the request by local search/retrieval. The
               message header is stripped from the result for
               convenience (see the code of `Wais::Search' rsp.
@@ -235,7 +220,6 @@ Protocol
   Wais::Search::new
 
                      $result = Wais::Search::new($message);
-
 
               Turn the result message in an object of type
               `Wais::Search'. The following methods are available:
@@ -248,7 +232,6 @@ Protocol
                      $result = new Wais::Docid($distserver, $distdb, $distid,
                                    $copyright,  $origserver, $origdb, $origid);
 
-
               Only the first four arguments are manatory.
 
   Wais::Docid::split
@@ -258,100 +241,95 @@ Protocol
                      ($distserver, $distdb, $distid) = Wais::Docid::split($result);
                      ($distserver, $distdb, $distid) = $result->split;
 
+              The inverse of `Wais::Docid::new' =over 10
 
-              The inverse of `Wais::Docid::new'
+    diagnostics
+              Return an array of references to `[$code, $message]'
 
-    diagnostics         Return an array of references to `[$code,
-                        $message]'
+    header    Return an array of references to `[$score, $lines,
+              $length, $headline, $types, $docid]'.
 
-    header              Return an array of references to `[$score,
-                        $lines, $length, $headline, $types,
-                        $docid]'.
-
-    text                Returns the chunk of the document requested. For
-                        documents larger than $Wais::CHARS_PER_PAGE
-                        more than one request must be send.
-
+    text      Returns the chunk of the document requested. For documents
+              larger than $Wais::CHARS_PER_PAGE more than one
+              request must be send.
 
   Wais::Search::DESTROY
 
-              The objects will be destroyed by Perl.
+    The objects will be destroyed by Perl.
 
 VARIABLES
-    $Wais::version      Generated by: `sprintf(buf, "Wais %3.1f%d",
-                        VERSION, PATCHLEVEL);'
+    $Wais::version
+              Generated by: `sprintf(buf, "Wais %3.1f%d", VERSION,
+              PATCHLEVEL);'
 
-    $Wais:errmsg        Set to an verbose error message if something
-                        went wrong. Most functions return `undef' on
-                        failure after setting `$Wais:errmsg'.
+    $Wais:errmsg
+              Set to an verbose error message if something went
+              wrong. Most functions return `undef' on failure after
+              setting `$Wais:errmsg'.
 
-    $Wais::maxdoc       Maximum number of hits to return when searching.
-                        Defaults to `40'.
+    $Wais::maxdoc
+              Maximum number of hits to return when searching.
+              Defaults to `40'.
 
     $Wais::CHARS_PER_PAGE
-                        Maximum number of bytes to retrieve in a
-                        single retrieve request. `Wais:Retrieve'
-                        sends multiple requests if necessary to
-                        retrieve a document. `CHARS_PER_PAGE'
-                        defaults to `4096'.
+              Maximum number of bytes to retrieve in a single
+              retrieve request. `Wais:Retrieve' sends multiple
+              requests if necessary to retrieve a document.
+              `CHARS_PER_PAGE' defaults to `4096'.
 
-    $Wais::timeout      Number of seconds to wait for an answer from
-                        remote servers. Defaults to 120.
+    $Wais::timeout
+              Number of seconds to wait for an answer from remote
+              servers. Defaults to 120.
 
-    $Wais::maxnumfd     Maximum number of file descriptors to use
-                        simultaneously in `Wais::Search'. Defaults
-                        to `10'.
-
+    $Wais::maxnumfd
+              Maximum number of file descriptors to use
+              simultaneously in `Wais::Search'. Defaults to `10'.
 
 Access to the basic freeWAIS-sf reduction functions
     Wais::Type::stemmer(*word*)
-              reduces *word* using the well know Porter algorithm.
+    reduces *word* using the well know Porter algorithm.
 
-                AU: Porter, M.F.
-                TI: An Algorithm for Suffix Stripping
-                JT: Program
-                VO: 14
-                PP: 130-137
-                PY: 1980
-                PM: JUL
-
+      AU: Porter, M.F.
+      TI: An Algorithm for Suffix Stripping
+      JT: Program
+      VO: 14
+      PP: 130-137
+      PY: 1980
+      PM: JUL
 
     Wais::Type::soundex(*word*)
-              computes the 4 byte Soundex code for *word*.
+    computes the 4 byte Soundex code for *word*.
 
-                AU: Gadd, T.N.
-                TI: 'Fisching for Werds'. Phonetic Retrieval of written text in
-                    Information Retrieval Systems
-                JT: Program
-                VO: 22
-                NO: 3
-                PP: 222-237
-                PY: 1988
-
+      AU: Gadd, T.N.
+      TI: 'Fisching for Werds'. Phonetic Retrieval of written text in
+          Information Retrieval Systems
+      JT: Program
+      VO: 22
+      NO: 3
+      PP: 222-237
+      PY: 1988
 
     Wais::Type::phonix(*word*)
-              computes the 8 byte Phonix code for *word*.
+    computes the 8 byte Phonix code for *word*.
 
-                AU: Gadd, T.N.
-                TI: PHONIX: The Algorithm
-                JT: Program
-                VO: 24
-                NO: 4
-                PP: 363-366
-                PY: 1990
-                PM: OCT
-
+      AU: Gadd, T.N.
+      TI: PHONIX: The Algorithm
+      JT: Program
+      VO: 24
+      NO: 4
+      PP: 363-366
+      PY: 1990
+      PM: OCT
 
 BUGS
-              `Wais::Search' currently splits the request in groups
-              of `$Wais::maxnumfd' requests. Since some requests of
-              the group might be local and/or some might refer to
-              the same host/port, groups may not use all
-              `$Wais::maxnumfd' possible file descriptors. Therefore
-              some performance my be lost when more than
-              `$Wais::maxnumfd' requests are processed.
+    `Wais::Search' currently splits the request in groups of
+    `$Wais::maxnumfd' requests. Since some requests of the group
+    might be local and/or some might refer to the same host/port,
+    groups may not use all `$Wais::maxnumfd' possible file
+    descriptors. Therefore some performance my be lost when more
+    than `$Wais::maxnumfd' requests are processed.
 
 AUTHORS
-              Ulrich Pfeifer <pfeifer@ls6.cs.uni-dortmund.de>,
-              Norbert Goevert <goevert@ls6.cs.uni-dortmund.de>
+    Ulrich Pfeifer <pfeifer@ls6.cs.uni-dortmund.de>, Norbert Goevert
+    <goevert@ls6.cs.uni-dortmund.de>
 

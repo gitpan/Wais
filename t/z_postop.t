@@ -21,8 +21,8 @@
 
 BEGIN {print "1..2\n";}
 
-open(PID, "<test/waisserver.pid")
-  or die "Could not read 'test/waisserver.pid'\n";
+open(PID, "< t/data/waisserver.pid")
+  or die "Could not read 't/data/waisserver.pid'\n";
 $pid = <PID>;
 close(PID);
 
@@ -30,12 +30,12 @@ unless (kill 1,$pid) {
   print "waisserver process pid=$pid seems gone!\n";
   print "not ";
 }
-unlink 'test/waisserver.pid';
-unlink 'test/waisserver.log';
+unlink 't/data/waisserver.pid';
+unlink 't/data/waisserver.log';
 
 print "ok 1\n";
 
-opendir(TEST, 'test')
+opendir(TEST, 't/data')
   or die "Could not opendir 'test': $!\n";
 
 while (defined ($_ = readdir(TEST))) {
@@ -43,8 +43,8 @@ while (defined ($_ = readdir(TEST))) {
   next if /^(test.?\.fmt|TEST)/;
   next unless /^(test|INFO)/;
   print "unlink $_\n";
-  unlink "test/$_"
-    or warn "Could not unlink 'test/$_': $!\n";
+  unlink "t/data/$_"
+    or warn "Could not unlink 't/data/$_': $!\n";
 }
 
 closedir TEST;

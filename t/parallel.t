@@ -3,10 +3,10 @@
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Tue Dec 12 16:55:05 1995
-# Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Feb 14 15:53:08 1997
+# Last Modified By: Norbert Goevert
+# Last Modified On: Mon Jul 13 17:28:12 1998
 # Language        : Perl
-# Update Count    : 111
+# Update Count    : 112
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -23,8 +23,8 @@ $result = Wais::Search
   (
    {
     'query'    => 'pfeifer', 
-    'database' => "test/$db1",
-    'database' => "test/$db2",
+    'database' => "t/data/$db1",
+    'database' => "t/data/$db2",
     }
   );
 
@@ -38,7 +38,7 @@ print "Testing local retrieve\n";
 
 $result = Wais::Retrieve
   (
-   'database' => "test/$db1",
+   'database' => "t/data/$db1",
    'docid'    => $id, 
    'type'     => 'TEXT',
   );

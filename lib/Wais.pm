@@ -12,7 +12,7 @@
 ##
 ## $Id: Wais.pm 1.6 Tue, 07 Apr 1998 16:34:24 +0200 goevert $
 ##
-## $ProjectHeader: Wais 23.7 Tue, 07 Apr 1998 16:34:24 +0200 goevert $
+## $ProjectHeader: Wais 23.11 Mon, 03 Aug 1998 18:56:40 +0200 goevert $
 ######################################################################
 
 
@@ -36,7 +36,7 @@ use vars qw(@ISA $CHARS_PER_PAGE $VERSION $timeout $maxnumfd);
 @ISA = qw(DynaLoader);
 
 
-'$ProjectVersion: 23.7 $ ' =~ /(\d+)\.(\d+)/; $VERSION = $1/10 + $2/1000;
+'$ProjectVersion: 23.11 $ ' =~ /(\d+)\.(\d+)/; $VERSION = $1/10 + $2/1000;
 
 $timeout  = 120;
 $maxnumfd = 10;

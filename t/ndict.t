@@ -3,10 +3,10 @@
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Wed Nov  8 12:02:19 1995
-# Last Modified By: Ulrich Pfeifer
-# Last Modified On: Fri Feb 14 14:04:11 1997
+# Last Modified By: Norbert Goevert
+# Last Modified On: Mon Jul 13 17:29:10 1998
 # Language        : Perl
-# Update Count    : 98
+# Update Count    : 99
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -20,7 +20,7 @@ BEGIN {
   print "ok 2\n";
 }
 
-$db = 'test/test';
+$db = 't/data/test';
 $au = tie %au, Wais::Dict, "${db}_field_au";
 
 print "ok 3\n";
@@ -79,6 +79,6 @@ $test++;
 %po = $au->POSTINGS('pfeifer');
 $result = join ',', sort {$a <=> $b} keys %po;
 $should = join ',', 1..10;
-print (($result eq $should)?"ok $test\n" : "not ok $test\n");
+print (($result eq $should) ? "ok $test\n" : "not ok $test\n");
 
 

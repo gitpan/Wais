@@ -1,0 +1,412 @@
+/*                               -*- Mode: C -*- 
+ * dictionary.c -- 
+ * ITIID           : $ITI$ $Header $__Header$
+ * Author          : Ulrich Pfeifer
+ * Created On      : Mon Nov  6 13:34:22 1995
+ * Last Modified By: Ulrich Pfeifer
+ * Last Modified On: Fri Nov 10 15:41:13 1995
+ * Language        : C
+ * Update Count    : 160
+ * Status          : Unknown, Use with caution!
+ * 
+ * (C) Copyright 1995, Universität Dortmund, all rights reserved.
+ * 
+ * $Locker: pfeifer $
+ * $Log: dictionary.c,v $
+ * Revision 2.0.1.5  1995/11/10  14:52:38  pfeifer
+ * patch9: Added headline().
+ *
+ * Revision 2.0.1.4  1995/11/09  20:30:47  pfeifer
+ * patch8: Added postings().
+ *
+ * Revision 2.0.1.2  1995/11/08  15:15:02  pfeifer
+ * patch6: Reorganized dictionary stuff completely.
+ *
+ * Revision 2.0.1.1  1995/11/08  08:21:49  pfeifer
+ * patch5: Code for examining local wais databases.
+ *
+ * Revision 1.2  1995/11/07  15:17:19  pfeifer
+ * Versuch mit hash.
+ *
+ * Revision 1.1  1995/11/07  12:46:18  pfeifer
+ * Initial revision
+ *
+ */
+#define BIG 10000
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#ifdef WORD
+#undef WORD			/* defined in the perl parser */
+#endif
+#ifdef _config_h_
+#undef _config_h_		/* load the freeWAIS-sf config.h also */
+#endif
+
+#include "dictionary.h"
+
+database       *
+open_database (db_name, fields, nfields)
+     char           *db_name;
+     char          **fields;
+     int             nfields;
+{
+  database       *db;
+  char            field_name[80];
+
+  db = openDatabase (db_name, false, true, nfields);
+  if (db == NULL) {
+    SV             *error = perl_get_sv ("Wais::errmsg", TRUE);
+
+    sv_setpv (error, "Could not open database");
+    return (NULL);
+  }
+  if (nfields) {
+    insert_fields (fields, nfields, db);
+  }
+  if (nfields && !open_field_streams_for_search (field_name, nfields, db)) {
+    char            buf[80];
+    SV             *error = perl_get_sv ("Wais::errmsg", TRUE);
+
+    sv_setpv (error, sprintf (buf, "Invalid field name '%s'", field_name));
+    disposeDatabase (db);
+    return (NULL);
+  }
+  return (db);
+}
+
+int
+find_partialword (db, field_name, word, offset, matches)
+     database       *db;
+     char           *word;
+     long             offset;
+     long           *matches;
+     char           *field_name;
+{
+  register SV   **sp = stack_sp;
+  long            answer;
+  long            number_of_occurances;
+  char           *match_word = "initial";
+  int             word_len = strlen (word);
+  char           *new_word = malloc (word_len + 2);
+
+  strcpy (new_word, word);
+  if (new_word[word_len - 1] != '*') {
+    new_word[word_len] = '*';
+    new_word[word_len + 1] = '\0';
+  }
+  answer =
+    look_up_partialword_in_dictionary ((field_name == NULL) ? "" : field_name,
+				       new_word,
+				       &number_of_occurances,
+				       &match_word,
+				       db);
+  if (TRACE)
+    fprintf (stderr, "field=%s word=%s\n", (field_name == NULL) ?
+	     "" : field_name, new_word);
+  s_free (new_word);
+
+  while (answer > -1) {
+    if (TRACE)
+      fprintf (stderr, "%d, %s\n", answer, match_word);
+    if ((GIMME == G_ARRAY)) {
+      EXTEND (sp, 2);
+      PUSHs (sv_2mortal (newSVpv (match_word, strlen (match_word))));
+      if (offset)
+	PUSHs (sv_2mortal (newSViv (answer)));
+      else
+	PUSHs (sv_2mortal (newSViv (number_of_occurances)));
+    } else {
+      (*matches)++;
+    }
+    answer = look_up_partialword_in_dictionary ((field_name == NULL) ?
+						"" : field_name,
+						NULL,
+						&number_of_occurances,
+						&match_word, db);
+  }
+  if ((GIMME == G_ARRAY))
+    PUTBACK;
+  return (0);
+}
+
+int
+find_word (database_name, field, word, offset, matches)
+     char           *database_name;
+     char           *field;
+     char           *word;
+     long           *matches;
+     long            offset;
+
+{
+  char           *fna[1];
+  int             all = (word == NULL);
+  int             result = 0;
+  database       *db;
+
+  if (field != NULL) {
+    fna[0] = strdup (field);
+    if ((db = open_database (database_name, fna, 1)) == NULL) {
+      s_free (fna[0]);
+      return (0);
+    }
+    s_free (fna[0]);
+  } else {
+    if ((db = open_database (database_name, fna, 0)) == NULL) {
+      return (0);
+    }
+  }
+
+  if (all) {
+    unsigned int    c;
+    unsigned char  *dummy = strdup ("a*");
+
+    for (c = 0; c < 256; c++) {
+      if (isalnum (c) && islower (c)) {
+	dummy[0] = c;
+	result |= find_partialword (db, field,
+				    dummy, offset, matches);
+      }
+    }
+    free (dummy);
+  } else {
+    result = find_partialword (db, field, word, offset, matches);
+  }
+  disposeDatabase (db);
+  return (!result);
+}
+
+#define W_ERROR(M,V) \
+{\
+        char           buff[80];\
+        SV             *error = perl_get_sv ("Wais::errmsg", TRUE);\
+\
+        if (db) disposeDatabase (db);\
+        s_free(index_block_header);\
+        s_free (posting_list);\
+        sv_setpv (error, sprintf (buf, M, V));\
+        return (0);\
+}
+
+int
+postings (database_name, field, word, number_of_postings)
+     char           *database_name;
+     char           *word;
+     char           *field;
+     long           *number_of_postings;
+{
+  register SV   **sp = stack_sp;
+  database       *db;
+  FILE           *stream;
+  char           *index_block_header = NULL;
+  char           *posting_list = NULL;
+  char           *fna[1];
+  long            index_file_block_number;
+  long            number_of_occurances;
+  long            not_full_flag = INDEX_BLOCK_FULL_FLAG;
+  long            number_of_valid_entries;
+  long            count, index_block_size;
+  long            posting_list_pos = 0;
+  long            char_list_size_readed = 0;
+  long            char_list_size = 0;
+  double          internal_weight;
+  long            txt_pos;
+  long            first_txt_pos;
+  long            distance = 0;
+  long            prev_distance = 0;
+  boolean         first_char_pos_readed = false;
+  unsigned char  *char_list = NULL;
+  unsigned char  *tmp_char_list = NULL;
+  unsigned char  *prev_char_list = NULL;
+
+  fna[0] = NULL;
+  if (field != NULL) {
+    fna[0] = strdup (field);
+    if ((db = open_database (database_name, fna, 1)) == NULL) {
+      s_free (fna[0]);
+      return (0);
+    }
+    s_free (fna[0]);
+  } else {
+    if ((db = open_database (database_name, fna, 0)) == NULL) {
+      return (0);
+    }
+  }
+
+  if (field == NULL) {
+    index_file_block_number =
+      look_up_word_in_dictionary (word, &number_of_occurances, db);
+  } else {
+    index_file_block_number =
+      field_look_up_word_in_dictionary (field, word, &number_of_occurances, db);
+  }
+  if (index_file_block_number < 0) {
+    disposeDatabase (db);
+    return (0);
+  }
+  if ((field != NULL) && (*field != '\0'))
+    stream = db->field_index_streams[pick_up_field_id (field, db)];
+  else
+    stream = db->index_stream;
+
+  if (0 != fseek (stream, (long) index_file_block_number,
+		  SEEK_SET)) {
+    W_ERROR ("fseek failed into the inverted file to position %ld",
+	     (long) index_file_block_number);
+  }
+  if (index_block_header == NULL) {
+    index_block_header = (unsigned char *)
+      calloc ((size_t) (INDEX_BLOCK_HEADER_SIZE * sizeof (char)),
+	                      (size_t) 1);
+  }
+  if (index_block_header == NULL) {
+    W_ERROR ("Out of memory", 0);
+  }
+  if (0 > fread_from_stream (stream, index_block_header,
+			     INDEX_BLOCK_HEADER_SIZE)) {
+    W_ERROR ("Could not read the index block", 1);
+  }
+  not_full_flag =
+    read_bytes_from_memory (INDEX_BLOCK_FLAG_SIZE,
+			    index_block_header);
+  *number_of_postings = number_of_valid_entries =
+    read_bytes_from_memory (NEXT_INDEX_BLOCK_SIZE,
+			    index_block_header + INDEX_BLOCK_FLAG_SIZE);
+  if (GIMME == G_ARRAY) {
+    index_block_size =
+      read_bytes_from_memory (INDEX_BLOCK_SIZE_SIZE,
+			      index_block_header +
+			      INDEX_BLOCK_FLAG_SIZE + NEXT_INDEX_BLOCK_SIZE);
+
+    posting_list = (unsigned char *)
+      calloc ((size_t) (index_block_size - INDEX_BLOCK_HEADER_SIZE)
+	      * sizeof (char), (size_t) 1);
+
+    if (posting_list != NULL) {
+      if (0 > fread_from_stream (stream, posting_list,
+			      index_block_size - INDEX_BLOCK_HEADER_SIZE)) {
+	W_ERROR ("Could not read the index block", 1);
+      }
+    } else {
+      W_ERROR ("Out of memory", 0);
+    }
+    if (EOF == index_block_size) {
+      W_ERROR ("reading from the index file failed", 1)
+    }
+    if (not_full_flag == INDEX_BLOCK_NOT_FULL_FLAG) {
+      /* not full */
+      number_of_valid_entries = 0;
+    } else if (not_full_flag == INDEX_BLOCK_FULL_FLAG) {
+      /* full */
+    } else {			/* bad news, file is corrupted. */
+      W_ERROR (
+	   "Expected the flag in the inverted file to be valid.  it is %ld",
+		not_full_flag);
+      return (0);
+    }
+
+    for (count = 0; count < number_of_valid_entries; count++) {
+      int             wgt = 0;
+      int             did;
+      AV*             POST = (AV*)sv_2mortal((SV *)newAV());
+
+      did = read_bytes_from_memory (DOCUMENT_ID_SIZE,
+				    posting_list + posting_list_pos);
+#ifdef LITTLEENDIAN
+      char_list_size =
+	htonl (read_bytes_from_memory (NUMBER_OF_OCCURANCES_SIZE,
+				       posting_list +
+				    (posting_list_pos + DOCUMENT_ID_SIZE)));
+#else
+      char_list_size =
+	read_bytes_from_memory (NUMBER_OF_OCCURANCES_SIZE,
+				posting_list +
+				(posting_list_pos + DOCUMENT_ID_SIZE));
+#endif
+      internal_weight =
+	read_weight_from_memory (NEW_WEIGHT_SIZE,
+				 posting_list +
+				 (posting_list_pos +
+				  DOCUMENT_ID_SIZE +
+				  NUMBER_OF_OCCURANCES_SIZE));
+
+      if (TRACE)
+          fprintf (stderr, "did=%d weight=%f\n", did, internal_weight);
+      PUSHs (sv_2mortal (newSViv (did)));
+      PUSHs (sv_2mortal (newRV((SV*)POST)));
+      av_push(POST, /* sv_2mortal */(newSVnv (internal_weight)));
+      char_list_size_readed = 0;
+      first_char_pos_readed = false;
+      first_txt_pos = prev_distance = distance = 0;
+      while (char_list_size > char_list_size_readed) {
+	if (first_char_pos_readed == false) {
+	  first_char_pos_readed = true;
+	  txt_pos = read_bytes_from_memory (CHARACTER_POSITION_SIZE,
+					    posting_list +
+					    (posting_list_pos +
+					     DOCUMENT_ID_SIZE +
+					     NUMBER_OF_OCCURANCES_SIZE +
+					     NEW_WEIGHT_SIZE));
+	  first_txt_pos = txt_pos;
+	  char_list_size_readed += CHARACTER_POSITION_SIZE;
+	} else {
+	  tmp_char_list = posting_list + (posting_list_pos +
+					  DOCUMENT_ID_SIZE +
+					  NUMBER_OF_OCCURANCES_SIZE +
+					  NEW_WEIGHT_SIZE +
+					  char_list_size_readed);
+	  prev_char_list = tmp_char_list;
+	  tmp_char_list = (unsigned char *)
+	    readCompressedInteger (&distance, tmp_char_list);
+	  txt_pos = first_txt_pos + prev_distance + distance;
+	  prev_distance += distance;
+	  char_list_size_readed += tmp_char_list - prev_char_list;
+	}
+        av_push(POST, /* sv_2mortal */(newSViv (txt_pos)));
+        if (TRACE)
+            fprintf (stderr, "distance=%d\n", txt_pos);
+	prev_distance += distance;
+	char_list_size_readed += tmp_char_list - prev_char_list;
+      }				/* while char_list */
+      posting_list_pos += DOCUMENT_ID_SIZE + NUMBER_OF_OCCURANCES_SIZE +
+	NEW_WEIGHT_SIZE + char_list_size;
+    }				/* for count */
+    PUTBACK;
+  }				/* GIMME */
+  if (db)
+    disposeDatabase (db);
+  s_free (index_block_header);
+  s_free (posting_list);
+  return (1);
+}				/* postings */
+
+char *
+headline(database_name, docid)
+     char           *database_name;
+     long           docid;
+{
+      char           *fna[1];
+      char           *result = NULL;
+      database       *db;
+      document_table_entry doc_entry;
+      char filename[MAX_FILE_NAME_LEN];
+      char  type[100];
+
+      fna[0] = NULL;
+      if ((db = open_database (database_name, fna, 0)) == NULL) {
+          return (0);
+      }
+      if (read_document_table_entry(&doc_entry, docid, db) 
+          == true) {
+          read_filename_table_entry(doc_entry.filename_id, 
+                                    filename,
+                                    type,
+                                    NULL,
+                                    db);
+          result = read_headline_table_entry(doc_entry.headline_id,db);
+      }
+      disposeDatabase (db);
+      return(result);
+}

@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+Wais.pm
+Wais.xs
+HTWAIS.c
+HTWAIS.h
+t/basic.t
+t/dict.t
+patchlevel.h
+README
+ChangeLog                    Added ChangeLog
+dictionary.c                 Code for examining local wais databases.
+dictionary.h

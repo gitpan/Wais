@@ -1,0 +1,88 @@
+Fri Nov 10 17:24:59 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Replaced magic variables. By real Variables.
+
+	Added version.
+
+Fri Nov 10 15:53:26 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Added dictionary.h and HTWAIS.h
+
+	Added headline().
+
+	Moved extern definitions to HTWAIS.h. Include HTWAIS.h and
+	dictionary.h.
+
+
+Fri Nov 10 08:56:51 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Added function postings() to access the inverted files.
+
+
+Wed Nov  8 19:31:19 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	'perl -w' now does not complain any more about uninitialized
+	value.
+
+	Test remote database also.
+
+Wed Nov  8 16:16:10 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Reorganized dictionary stuff completely.
+
+	Added TESTDB for tests. Tests use the FIELD-EXAMPLE/test
+	database in the freeWAIS-sf source directory.
+
+
+Wed Nov  8 09:22:27 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	More standard Makefile.PL.
+
+	README now describes how to build outside the perl source tree.
+
+	New functions dictionary and list_offset.
+	Code for examining local wais databases.
+
+Fri Sep 29 13:03:32 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Interactive search for the freeWAIS-sf includes and
+	libraries. Also removed .../ctype/ctype.o. Make sure to
+	include it in libwais.a. This is done with freeWAIS-sf-2.0.19
+	automatically.
+
+	Added README. It is just part of an article posted by Jonathan
+	K. Cohen.  No time to write myself :-(.
+
+Sun Sep 10 11:59:41 MET DST 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+
+	Passed HTWAIS.c trough gnu indent.
+
+	Sun Sep 10 11:37:17 MET DST 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Test if the given freeWAIS-sf source directory exists and
+	query user if not.
+
+	Fixed include statements to work for freeWAIS-sf-2.0.
+	Ok with cc now.
+
+	Added patchlevel.h to distribution.
+

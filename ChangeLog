@@ -1,3 +1,11 @@
+1998-04-07  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	* 2.307 is new version
+	
+	* Wais.pm: fixed multiple database parallel bug
+
+	* some changes in structure
+
 Fri Feb 14 15:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
 
 	* patchlevel.h: Release 2.3 will now work with local test
@@ -28,7 +36,7 @@ Fri Feb 14 14:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 	  freeWAIS-sf source directory. This file contains some hints how
 	  to build wais.h and libwais.a.
 
-	* Wais.pm: Retrieve did ignore port number. Did'nt I fix that
+	* Wais.pm: Retrieve did ignore port number. Didn't I fix that
 	  already?
 
 	* README: Removed this weird compile-from-freeWAIS-sf-source stuff.

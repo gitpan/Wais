@@ -1,15 +1,14 @@
 ChangeLog
 HTWAIS.c
 HTWAIS.h
-INSTALL                      Generated from INSTALL.pod
+INSTALL
 MANIFEST
 Makefile.PL
 README                       Generated from Wais.pm
-Wais.pm
-Wais.pod                     Some documentation for the curious.
 Wais.xs
 Wais.h                       Wrapper around wais.h
-Wais/Dict.pm
+lib/Wais/Dict.pm
+lib/Wais.pm                  Including some documentation for the curious.
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
 inspect.PL                   Example script for exploring wais databases.

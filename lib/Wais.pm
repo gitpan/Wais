@@ -1,46 +1,330 @@
-########################## -*- Mode: Indented-Text -*- ########################
-## Wais.pod -- 
-## ITIID           : $ITI$ $Header $__Header$
-## Author          : Ulrich Pfeifer
-## Created On      : Wed Dec 13 12:26:05 1995
-## Last Modified By: Ulrich Pfeifer
-## Last Modified On: Thu Aug 15 19:10:30 1996
-## Language        : Pod
-## Update Count    : 50
-## Status          : Unknown, Use with caution!
-## 
-## (C) Copyright 1995, Universität Dortmund, all rights reserved.
-## 
-## $Locker:  $
-## $Log: Wais.pod,v $
-## Revision 2.3  1997/02/06 09:31:02  pfeifer
-## Switched to CVS
+######################### -*- Mode: Perl -*- #########################
 ##
-## Revision 2.2  1996/08/19 17:15:20  pfeifer
-## perl5.003
+## File             : Makefile.PL
 ##
-## Revision 2.1.1.5  1996/08/19 15:31:14  pfeifer
-## patch16: Documented stemming & co in Wais.pod
+## Description      : Wais - access to freeWAIS-sf libraries
 ##
-## Revision 2.1.1.4  1996/07/16 16:37:35  pfeifer
-## patch10: Fixed some typos. New functions are not yet documented.
+## Author           : Ulrich Pfeifer
+## Created On       : Tue Dec 12 08:55:26 1995
 ##
-## Revision 2.1.1.3  1996/02/23 15:45:18  pfeifer
-## patch4: Documented Wais::Docid::new and Wais::Docid::split.
+## Last Modified By : Norbert Goevert
+## Last Modified On : Tue Apr  7 16:30:25 1998
 ##
-## Revision 2.1.1.2  1996/02/05 12:41:25  pfeifer
-## patch2: Fixed typos.
+## $Id: Wais.pm 1.6 Tue, 07 Apr 1998 16:34:24 +0200 goevert $
 ##
-## Revision 2.1.1.1  1995/12/28 16:27:13  pfeifer
-## patch1: Tiny fixes.
-##
-## Revision 2.1  1995/12/13  14:56:43  pfeifer
-## *** empty log message ***
-##
-## Revision 2.0  1995/12/13  14:38:13  pfeifer
-## First try.
-##
-###############################################################################
+## $ProjectHeader: Wais 23.7 Tue, 07 Apr 1998 16:34:24 +0200 goevert $
+######################################################################
+
+
+use strict;
+
+
+## ###################################################################
+## package Wais
+## ###################################################################
+
+package Wais;
+
+
+require DynaLoader;
+use IO::Socket;
+use IO::Select;
+use Carp;
+
+
+use vars qw(@ISA $CHARS_PER_PAGE $VERSION $timeout $maxnumfd);
+@ISA = qw(DynaLoader);
+
+
+'$ProjectVersion: 23.7 $ ' =~ /(\d+)\.(\d+)/; $VERSION = $1/10 + $2/1000;
+
+$timeout  = 120;
+$maxnumfd = 10;
+
+bootstrap Wais $VERSION;
+
+
+## ###################################################################
+## subs
+## ###################################################################
+
+sub Search {
+  
+  my(@requests) = @_;
+  my $missing = 0;                        # number of answers missing
+  my $header  = '';                       # last read message header
+  my $message = '';                       # last read message
+  my $request;                            # current request
+  my $select = IO::Select->new();         # open sockets 
+  my $result;                             # references to results
+  my ($timeleft) = $Wais::timeout;
+  my %known_tags;                         # tags -> 1
+  my %local;                              # local requests
+  my %pending;                            # requests still to send
+  my %fh;                                 # tag -> filehandle
+  my %tag;                                # filehandle -> tag
+  
+  if ($#requests > $Wais::maxnumfd - 1) {
+    # We assume worst case here. We may need less fds since local
+    # searches do not count and some databases may be reached with
+    # the same fd.
+    
+    $result    = Search($requests[$Wais::maxnumfd .. $#requests]);
+    $#requests = $Wais::maxnumfd-1;
+  } else {
+    $result = new Wais::Result;  
+  }
+  
+  foreach $request (@requests) {
+    if (ref($request)) {
+      my $query    = $request->{'query'};
+      my $database = $request->{'database'};
+      my $host     = $request->{'host'} || 'localhost';
+      my $port     = $request->{'port'} || 210;
+      my $tag      = $request->{'tag'}  || $request->{'database'};
+      my $docids   = $request->{'relevant'};
+      my $apdu;
+      my $fh;
+      # make sure that tag is unique
+      $tag++ while defined($known_tags{$tag}); $known_tags{$tag} = 1;
+      
+      if (ref($docids)) {
+        $apdu = generate_search_apdu($query, $database, $docids);
+      } else {
+        $apdu = generate_search_apdu($query, $database);
+      }
+      
+      if (($host eq 'localhost') && (-e "$database.src")) {
+        # We will handle local searches when as many as possible
+        # remote requests have been send.
+        $local{$tag} = $apdu;
+      } else {
+        if ($fh{$host.':'.$port}) { 
+          # We have a connection already.
+          # Postpone sending until answer for first request is arived
+          $pending{$fh{$host.':'.$port}}->{$tag} = $apdu;
+        } else {
+          # Open a connection to peer
+          $fh = new IO::Socket::INET(PeerAddr => $host,
+                                     PeerPort => $port,
+                                     Proto    => 'tcp',
+                                     Type     => SOCK_STREAM);
+          # croak "Could not connect to $host:$port" unless $fh;
+          if ($fh) {
+            $fh->autoflush(1);
+            $fh{$host.':'.$port} = $fh;
+            # remember $tag for $fh
+            $tag{$fh} = $tag;
+            $fh->print($apdu);              # send the request
+            $select->add($fh);
+            $missing++;
+          } else {
+            $result->add_diag($tag, '', "Could not connect to $host:$port");
+          }
+        }
+      }
+    } else {
+      croak "Usage: Wais::Search([query, database, host, port], ....)";
+    }
+  }
+
+  # Answer local requests to give the remote servers time to process
+  # requests.
+  foreach (keys %local) {
+    $message = local_answer($local{$_});
+    if ($message) {
+      $result->add($_, Wais::Search::new($message));
+    }
+  }
+
+  while ($missing > 0 and $timeleft > 0) {
+    my $time = time;
+    my @ready = $select->can_read($timeleft);
+    my $fh;
+    
+    $timeleft -= (time - $time);          # adjust timeleft
+    foreach $fh (@ready) {
+      my $tag = $tag{$fh};
+      my $header = '';
+      
+      $fh->read($header, 25);
+      my $length = substr($header,0,10);
+      $fh->read($message, $length);
+      $missing--;
+      $result->add($tag, Wais::Search::new($message));
+
+      # check if we have pending requests for this $fh
+      if (defined $pending{$fh}) {
+        my($tag, @tags) = keys %{$pending{$fh}};
+        $fh->print($pending{$fh}->{$tag});
+        $tag{$fh} = $tag;
+        $missing++;
+        delete $pending{$fh}->{$tag};
+        undef $pending{$fh} unless @tags;
+      } else {
+        # we are done with this guy
+        $select->remove($fh);
+        $fh->close;
+      }
+      last unless $missing;
+    }
+  }
+  
+  return($result);
+}
+
+
+sub Retrieve {
+  
+  my %par = @_;
+  my $database = $par{'database'};
+  my $host     = $par{'host'}  || 'localhost';
+  my $port     = $par{'port'}  || 210;
+  my $chunk    = $par{'chunk'} || 0;
+  my $docid    = $par{'docid'};
+  my $type     = $par{'type'}  || 'TEXT';
+  my $message  = '';
+  my $header   = '';
+  my ($fh, $length);
+  my $apdu; 
+  my $result   = new Wais::Result('type' => $type);
+  my $presult;
+  
+  if (($host eq 'localhost') && (-e "$database.src")) {
+    while (1) {
+      $apdu = &generate_retrieval_apdu($database, $docid, $type, $chunk++);
+      $message = local_answer($apdu);
+      last unless $message;
+      $presult = &Wais::Search::new($message);
+      $result->add('document', $presult);
+      last if length($presult->text) != $Wais::CHARS_PER_PAGE;
+    }
+  } else {
+    $fh = new IO::Socket::INET(PeerAddr => $host,
+                               PeerPort => $port,
+                               Proto    => 'tcp',
+                               Type     => SOCK_STREAM);
+    croak "Could not connect to $host:$port" unless $fh;
+    $fh->autoflush(1);
+    
+    while (1) {
+      $apdu = &generate_retrieval_apdu($database, $docid, $type, $chunk++);
+      $fh->print($apdu);                  # send the request
+      $fh->read($header, 25);
+      $length = substr($header,0,10);
+      $fh->read($message, $length);
+      $presult = &Wais::Search::new($message);
+      $result->add('document', $presult);
+      last if length($presult->text) != $Wais::CHARS_PER_PAGE;
+    }
+    $fh->close;
+  }
+  $result;
+}
+
+
+## ###################################################################
+## package Wais::Result
+## ###################################################################
+
+package Wais::Result;
+
+
+## public ############################################################
+
+sub new {
+
+  my $type = shift;
+  my %par  = @_;
+  my $self = {'header' => [], 'diagnostics' => [], 'text' => '', 
+              'type'   => $par{'type'}};
+  
+  bless $self, $type;
+}
+
+
+sub add {
+
+  my $self = shift;
+  my ($tag, $result)  = @_;
+  
+  if ($result) {
+    if (ref($result)) {
+      my @result;
+      my @left  = @{$self->{'header'}};
+      my @right = $result->header;
+      while (($#left >= $[) or ($#right >= $[)) {
+        if ($#left < $[) {
+          for (@right) {
+            push @result, [$tag, @{$_}];
+          }
+          last;
+        }
+        if ($#right < $[) {
+          push @result, @left;
+          last;
+        }
+        if ($left[0]->[1] > $right[0]->[0]) {
+          push @result, shift @left;
+        } else {
+          push @result, [$tag, @{shift @right}];
+        }
+      }
+      $self->{'header'} = \@result;
+      my %diag = $result->diagnostics;
+      for (keys %diag) {
+        push(@{$self->{'diagnostics'}}, [$tag, $_, $diag{$_}]);
+      }
+      if ($result->text) {
+        $self->{'text'} .= $result->text;
+      }
+    } else {
+      push(@{$self->{'diagnostics'}}, [$tag, 'Wais::Result::add No reference']);
+    }
+  } else {
+    push(@{$self->{'diagnostics'}}, [$tag, 'Wais::Result::add No result']);
+  }
+  $self;
+}
+
+
+sub diagnostics {
+
+  my $self = shift;
+  
+  @{$self->{'diagnostics'}};
+}
+
+
+sub add_diag {
+  
+  my $self = shift;
+  my($tag, $code, $message) = @_;
+  push(@{$self->{'diagnostics'}}, [$tag, $code, $message])
+}
+
+
+sub header {
+
+  my $self = shift;
+  
+  @{$self->{'header'}};
+}
+
+
+sub text {
+
+  my $self = shift;
+  
+  $self->{'text'};
+}
+
+
+1;
+__END__
+## ###################################################################
+## pod
+## ###################################################################
 
 =head1 NAME
 
@@ -48,7 +332,7 @@ Wais - access to freeWAIS-sf libraries
 
 =head1 SYNOPSIS
 
-C<use Wais;>
+C<require Wais;>
 
 =head1 DESCRIPTION
 
@@ -69,10 +353,10 @@ XS functions which provide a low-level access to the WAIS
 protocol. E.g. C<generate_search_apdu()> constructs a request
 message.
 
-=item B<SFgate 5.0>
+=item B<SFgate 5>
 
 Perl functions that implement high-level access to WAIS
-servers. E.g. parallel searching is supported.
+servers. E. g. parallel searching is supported.
 
 =item B<dictionary>
 
@@ -80,7 +364,7 @@ A bunch of XS functions useful for inspecting local databases.
 
 =back
 
-We will start with the B<SFgate 5.0> functions.
+We will start with the B<SFgate 5> functions.
 
 =head1 USAGE
 
@@ -437,8 +721,7 @@ use all C<$Wais::maxnumfd> possible file descriptors. Therefore some
 performance my be lost when more than C<$Wais::maxnumfd> requests are
 processed.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Ulrich Pfeifer F<E<lt>pfeifer@ls6.informatik.uni-dortmund.deE<gt>>
-
-
+Ulrich Pfeifer F<E<lt>pfeifer@ls6.cs.uni-dortmund.deE<gt>>,
+Norbert Goevert F<E<lt>goevert@ls6.cs.uni-dortmund.deE<gt>>

@@ -32,10 +32,10 @@ eval 'exec perl -S $0 "$@"'
 # ITIID           : $ITI$ $Header $__Header$
 # Author          : Ulrich Pfeifer
 # Created On      : Fri Nov 10 12:54:53 1995
-# Last Modified By: Ulrich Pfeifer
-# Last Modified On: Tue Apr 23 10:14:45 1996
+# Last Modified By: Norbert Goevert
+# Last Modified On: Mon Apr  6 15:40:19 1998
 # Language        : Perl
-# Update Count    : 321
+# Update Count    : 323
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -68,15 +68,11 @@ use Wais;
 use Wais::Dict;
 
 @dbdirs = (
-           '/home/robots/wais/wais-sources',
-           '/usr/local/ls6/src/freeWAIS-sf-2.0/sun4-sunos/FIELD-EXAMPLE',
+           '/usr/projects/www/db/Wais',
            );
 
 
-if ($#ARGV < $[) {
-    @ARGV = @dbdirs;
-}
-
+@ARGV = @dbdirs unless @ARGV;
 
 if ($HAVE_CURSES) {       
     initscr;                 # Set $COLS,$LINES
@@ -399,7 +395,48 @@ sub Redraw {
     }
     $win->refresh if $HAVE_CURSES;
 }
+
+           
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+inspect - inspect Wais databases
+
+
+=head1 SYNOPSIS
+
+B<inspect> [dbdir]
+
+
+=head1 DESCRIPTION
+
+With B<inspect> you can easily inspect contents of your Wais databases.
+
+
+=head1 BUGS
+
+Not much more than no documentation ;-)
+
+
+=head1 SEE ALSO
+
+Wais(3), perl(1)
+
+
+=head1 AUTHOR
+
+Ulrich Pfeifer F<E<lt>pfeifer@ls6.cs.uni-dortmund.deE<gt>>,
+
+
+=cut
+
+
 !NO!SUBS!
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
+  

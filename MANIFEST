@@ -9,8 +9,8 @@ Wais.xs
 dictionary.c                 Code for examining local wais databases.
 dictionary.h
 inspect.PL                   Example script for exploring wais databases.
-lib/Wais.pm
-lib/Wais/Dict.pm
+Wais.pm
+Wais/Dict.pm
 mkinc
 patchlevel.h
 t/basic.t

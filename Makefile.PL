@@ -6,9 +6,9 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Tue Nov  5 19:26:16 1996
+# Last Modified On: Tue Nov 26 13:53:29 1996
 # Language        : Perl
-# Update Count    : 190
+# Update Count    : 194
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -53,7 +53,7 @@ if (!$NOSRC and $FW) {
     $OBJECT = "$FW/ctype/ctype.o";
   } else {
     print STDERR "I do not see '$FW/ctype/ctype.o'\n";
-    print STDERR "Assuming that's in linwais.a.\n";
+    print STDERR "Assuming that's in libwais.a.\n";
   }
   $LDFLAGS  = "-L$FW/ir -L$FW/regexp -L$FW/lib";
   $CFLAGS   = "-I$FW/ir";
@@ -62,6 +62,7 @@ if (!$NOSRC and $FW) {
   print STDERR "Assume that you generated 'wais.h'. See README for details.\n";
   write_include(1);
   $regexp = "-lregexp";         # must check for that !
+  $LDFLAGS  = $CFLAGS  = '';
 } 
 
 $TESTDB = "$FW/FIELD-EXAMPLE/test" unless (-e "$TESTDB.doc") ;
@@ -73,14 +74,14 @@ unless (-e "$TESTDB.doc") {
 
 
 $VERSION = getversion('patchlevel.h');
-rewrite('lib/Wais.pm', 'Wais', $VERSION);
+rewrite('Wais.pm', 'Wais', $VERSION);
 
 &WriteMakefile
   (
    'PREREQ_PM'    => { IO::Select => 0,
                      },
    'LIBS'           => "$LDFLAGS -lwais $regexp -lftw -lm",
-   'INC'            => $CFLAGS,
+   'INC'            => "$CFLAGS -DWAIS_USES_STDIO",
    'NAME'           => 'Wais',
    'VERSION'        => $VERSION,
    'OBJECT'         => "Wais.o HTWAIS.o dictionary.o $OBJECT",

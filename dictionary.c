@@ -4,9 +4,9 @@
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
  * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Wed Sep  4 20:23:09 1996
+ * Last Modified On: Tue Nov 26 13:44:48 1996
  * Language        : C
- * Update Count    : 194
+ * Update Count    : 210
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
@@ -271,6 +271,11 @@ postings (database_name, field, word, number_of_postings)
     stream = db->field_index_streams[pick_up_field_id (field, db)];
   else
     stream = db->index_stream;
+#ifdef WAIS_USES_STDIO
+#ifdef fseek
+#undef fseek
+#endif
+#endif
 
   if (0 != fseek (stream, (long) index_file_block_number,
 		  SEEK_SET)) {
@@ -495,8 +500,15 @@ document (database_name, docid)
   if (NULL == buf) {
     W_ERROR ("Out of memory", 0);
   }
+#ifdef WAIS_USES_STDIO
+#ifdef fread
+#undef fread
+#endif
   bytesRead = fread ((void *) buf, (size_t) sizeof (char),
-		     length, input_stream);
+ 		     length, input_stream);
+#else
+  bytesRead = PerlIO_read (input_stream, (void *) buf, length);
+#endif
 
   if (bytesRead != length) {
     W_ERROR ("Could not read document completely %d", length-bytesRead);

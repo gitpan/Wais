@@ -1,14 +1,33 @@
-NEWS:
-=====
+Thu Aug  1 20:15:26 MET DST 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
-The chat2.pl problems are history. Wais.pm uses the IO extension for
-perl5 now. The perl distributions starting from version 5.003_01 do
-contain this extension. For older Perl versions, get
-GBARR/IO-1.12.tar.gz or later from CPAN.
+Description patch15:
 
-Also you need the freeWAIS-sf-2.0 distribution with patchlevel >=
-46. Any version must be compiled with LOCAL_SEARCH enabled.
+The 'ndict' test revealed problems on little endian architectures.
+Fixed that. Problem with dictionary last word remains on some systems.
+Runs without problems on sunos 4.1.4, 5.5 and linux.
 
+Description patch14:
+
+Makefile.PL
+	Source building method now includes 'ctype.o' if found.
+	This should help people with freeWAIS-sf distributions which 
+	do not include it in libwais.a (i.e. all current public availabe 
+        versions. 
+t/
+	Added new test fro Dict.pm.
+
+t/parallel.t
+	Added use lib '.' to make it find chat2.pl in current
+	directory.
+
+lib/Wais/Dict.pm
+        Some fixes to make 'perl -w' happy.
+
+
+------------------------------------------------------------------------
+For installation you need a installed perl5. I used perl5.001n and
+perl5.002.  Also you need the freeWAIS-sf-2.0 distribution with
+patchlevel >= 46. 
 
 There are two ways to build this extension:
 
@@ -101,32 +120,34 @@ Then run 'perl Makefile.PL'. For building a dynamic extension use
 
 For building a perl with the wais extensions statically linked use
 
-        make waisperl; make test_static;
+        make perl; make test_static;
 
 See the documentation of MakeMaker for details. Run
 
         perldoc ExtUtils::MakeMaker
 
-If you don't have acces to the internet, the output of 'make test'
-will look like this:
+chat2.pl:
+=========
 
-,-----
-| t/basic.............Use of uninitialized value at t/basic.t line 85.
-| Use of uninitialized value at t/basic.t line 86.
-| FAILED tests 3-4
-|         Failed 2/4 tests, 50.00% okay
-| t/dict..............ok
-| t/ndict.............ok
-| t/parallel..........Use of uninitialized value at /usr/local/lib/perl5/Socket.pm line 239.
-| Can't use an undefined value as an ARRAY reference at t/parallel.t line 104.
-| dubious
-|         Test returned status 32 (wstat 8192)
-| Failed Test  Status Wstat Total Fail  Failed  List of failed
-| ------------------------------------------------------------------------------
-| t/basic.t                     4    2  50.00%  3-4
-| t/parallel.t     32  8192     6   ??       %  ??
-| Failed 2/4 test scripts, 50.00% okay. 6/33 subtests failed, 81.82% okay.
-`-----
+        The standard chat2.pl does not work on SOLARIS (If you did not
+        'use Socket.pm' before loading 'caht2.pl'). I have
+        included a self-extracting chat2.pl which will serve a
+        replacement for the distributions chat2.pl. It uses the socket
+        module to set the parameters. On systems on which chat2.pl
+        works, the replacement it will be some miliseconds faster ;-)
+
+        5.002:
+        You must remove the orignal chat2.pl since it will be in the
+        include path before this chat2.pl after installation. 'make
+        install' will ask you if it should be removed.  If you are
+        paranoid, run diff on both versions. They are identical
+        besides some socket constants. You can verify them in
+        sockets.h if you want to.
+
+        5.001
+        Installation will overwrite chat2.pl anyway ;-)
+
+        Trust me ;-)
 
 Ulrich Pfeifer
 

@@ -13,9 +13,6 @@
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.h,v $
- * Revision 2.2  1996/08/19 17:15:20  pfeifer
- * perl5.003
- *
  * Revision 2.1.1.3  1996/07/16 16:38:55  pfeifer
  * patch10: Modified for building from installed freeWAIS-sf libraries
  * patch10: and include files.

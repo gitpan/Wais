@@ -1,16 +1,4 @@
-Mon Aug 19 17:32:01 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
-
-. Description:
-
-	Added stemming test.
-
-	README mentions 'make waisperl' now.
-
-	Documented stemming & co in Wais.pod
-
-	Fixed call for setemming stuff.
-
-	Thu Aug  8 09:12:40 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+Thu Aug  8 09:12:40 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 Description patch 15:
 

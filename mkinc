@@ -17,9 +17,6 @@ eval 'exec perl  -S $0 "$@"'
 # 
 # $Locker: pfeifer $
 # $Log: mkinc,v $
-# Revision 2.2  1996/08/19 17:15:20  pfeifer
-# perl5.003
-#
 # Revision 2.1.1.1  1996/07/16 16:40:25  pfeifer
 # patch10: Script for building wais.h from the freeWAIS-sf source
 # patch10: directory.

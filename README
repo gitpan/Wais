@@ -1,5 +1,11 @@
 Thu Aug  1 20:15:26 MET DST 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
+Description patch15:
+
+The 'ndict' test revealed problems on little endian architectures.
+Fixed that. Problem with dictionary last word remains on some systems.
+Runs without problems on sunos 4.1.4, 5.5 and linux.
+
 Description patch14:
 
 Makefile.PL

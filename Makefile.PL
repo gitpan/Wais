@@ -15,6 +15,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: Makefile.PL,v $
+# Revision 2.1.1.9  1996/08/08 07:11:16  pfeifer
+# patch15: Fixed ctype.o stuff. Upgrade to 5.003_01.
+#
 # Revision 2.1.1.8  1996/08/01 18:10:00  pfeifer
 # patch14: Source building method now includes 'ctype.o' if found.
 # patch14: This should help people with freeWAIS-sf distributions which

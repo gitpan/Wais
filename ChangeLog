@@ -1,3 +1,10 @@
+Thu Aug  8 09:12:40 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 15:
+
+Dict.pm
+	Fixed little endian problem.
+
 Thu Aug  1 20:15:26 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 Description patch14:

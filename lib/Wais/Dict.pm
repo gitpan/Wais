@@ -5,15 +5,18 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Mon Feb 26 18:34:50 1996
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Mon Aug  5 13:52:20 1996
+# Last Modified On: Wed Aug  7 23:11:17 1996
 # Language        : Perl
-# Update Count    : 96
+# Update Count    : 106
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1996, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Dict.pm,v $
+# Revision 2.1.1.5  1996/08/08 07:12:13  pfeifer
+# patch15: Fixed little endian problem.
+#
 # Revision 2.1.1.4  1996/08/01 18:11:58  pfeifer
 # patch14: Some fixes to make 'perl -w' happy.
 #
@@ -38,7 +41,7 @@ use vars qw($VERSION);
 {
   my $Revision = '';
   
-  $VERSION = join '', q$Revision: 2.1.1.4 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
+  $VERSION = join '', q$Revision: 2.1.1.5 $ =~ /(\d+\.\d+)\.?(\d+)?\.?(\d+)?/;
 }
 use Carp;
 use FileHandle;
@@ -80,13 +83,13 @@ sub TIEHASH {
     }
     my $buf = '';
     read($$fh,$buf,4) || croak "Could not read header: $!";
-    my ($magic, $blk) = unpack 'SS', $buf;
+    my ($magic, $blk) = unpack 'Sn', $buf;
     croak "$file is no dictionary file" if $magic != 0;
     my (%dir, @dir);
     $self->{FI} = 4+29*$blk;
     while ($blk-->0) {
         read($$fh,$buf,29);
-        my ($term,$ptr, $occ) = unpack 'A21 I I', $buf;
+        my ($term,$ptr, $occ) = unpack 'A21 N N', $buf;
         last unless $term;
         push @dir, $term;
         $dir{$term} = $ptr;
@@ -170,7 +173,7 @@ sub getterm {
     $fh->seek($offset,0) or return undef;
     my $buf = '';               # perl -w
     read($$fh,$buf,29)==29 or return undef;
-    unpack 'A21 I I', $buf;
+    unpack 'A21 N N', $buf;
 }
 
 sub FIRSTKEY {
@@ -187,7 +190,7 @@ sub NEXTKEY {
     my $fh   = $self->{FH};
 
     read($$fh,$buf,29) || return undef;
-    my ($term,$ptr, $occ) = unpack 'A21 I I', $buf;
+    my ($term,$ptr, $occ) = unpack 'A21 N N', $buf;
 
     return undef unless $term;  # just paranoid
     # We save the value for this term since each() calls NEXTKEY/FETCH
@@ -207,7 +210,7 @@ sub PREVKEY {
     read($$fh,$buf,29)               || return undef;
     $self->{FH}->seek(-29,1)         || return undef;
 
-    my ($term,$ptr, $occ) = unpack 'A21 I I', $buf;
+    my ($term,$ptr, $occ) = unpack 'A21 N N', $buf;
 
     return undef unless $term;  # just paranoid
     # We save the value for this term for no particular reason.
@@ -268,15 +271,16 @@ sub POSTINGS {
     }
   }
   $fh->seek($offset,0) || confess "could not seek: $!\n";
+
   my ($flag,$npo,$size,$did,$bsize,$weight,$ch,$cl,$charpos);
   my $buf = '';
   read($$fh,$buf,9);
-  ($flag,$npo,$size) = unpack 'aII', $buf;
+  ($flag,$npo,$size) = unpack 'aNN', $buf;
   return unless $size;
   for (1 .. $npo) {
     my @pos;
     read($$fh,$buf,15);
-    ($did,$bsize,$weight,$ch,$cl) = unpack 'IIfSC*', $buf;
+    ($did,$bsize,$weight,$ch,$cl) = unpack 'NIfnC*', $buf;
     $charpos = ($ch<<8) + $cl;
     if ($bsize>3) {
       read($$fh,$buf,$bsize-3);

@@ -13,6 +13,9 @@
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.h,v $
+ * Revision 2.1  1995/12/13  14:56:31  pfeifer
+ * *** empty log message ***
+ *
  * Revision 2.0.1.2  1995/11/16  12:23:55  pfeifer
  * patch11: Added document.
  *

@@ -14,6 +14,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: dict.t,v $
+# Revision 2.1  1995/12/13  14:53:23  pfeifer
+# *** empty log message ***
+#
 # Revision 2.0.1.4  1995/11/16  12:23:25  pfeifer
 # patch11: Added document.
 #

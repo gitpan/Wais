@@ -13,6 +13,9 @@
  * 
  * $Locker: pfeifer $
  * $Log: HTWAIS.h,v $
+ * Revision 2.1  1995/12/13  14:53:14  pfeifer
+ * *** empty log message ***
+ *
  * Revision 2.0.1.1  1995/11/10  14:52:19  pfeifer
  * patch9: Extern definitions.
  *

@@ -14,6 +14,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: inspect,v $
+# Revision 2.1  1995/12/13  14:56:35  pfeifer
+# *** empty log message ***
+#
 # Revision 2.0.1.1  1995/11/16  12:24:51  pfeifer
 # patch11: Examin Wais databases in directories given on the command
 # patch11: line. Needs Curses.

@@ -16,6 +16,9 @@
  * 
  * $Locker: pfeifer $
  * $Log: HTWAIS.c,v $
+ * Revision 2.1  1995/12/13  14:53:08  pfeifer
+ * *** empty log message ***
+ *
  * Revision 2.0.1.4  1995/11/10  16:24:29  pfeifer
  * patch10: Replaced magic variables. By real Variables.
  *

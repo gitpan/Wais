@@ -26,6 +26,9 @@
 # 
 # $Locker: pfeifer $
 # $Log: basic.t,v $
+# Revision 2.1  1995/12/13  14:53:19  pfeifer
+# *** empty log message ***
+#
 # Revision 2.0.1.2  1995/11/08  18:31:05  pfeifer
 # patch7: Test remote database also.
 #

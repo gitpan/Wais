@@ -3,16 +3,22 @@
  * ITIID           : $ITI$ $Header $__Header$
  * Author          : Ulrich Pfeifer
  * Created On      : Mon Nov  6 13:34:22 1995
- * Last Modified By: Ulrich Pfeifer
- * Last Modified On: Wed Nov 15 11:39:50 1995
+ * Last Modified By: Testaccount
+ * Last Modified On: Mon Dec 11 11:12:25 1995
  * Language        : C
- * Update Count    : 177
+ * Update Count    : 179
  * Status          : Unknown, Use with caution!
  * 
  * (C) Copyright 1995, Universität Dortmund, all rights reserved.
  * 
  * $Locker: pfeifer $
  * $Log: dictionary.c,v $
+ * Revision 2.1  1995/12/13  14:56:27  pfeifer
+ * *** empty log message ***
+ *
+ * Revision 2.0.1.8  1995/12/12  11:46:37  pfeifer
+ * patch13: sprinf fixes.
+ *
  * Revision 2.0.1.7  1995/11/16  12:23:48  pfeifer
  * patch11: Added document.
  * patch11: Fixed postings bug (did not allocate space on stack).
@@ -77,7 +83,8 @@ open_database (db_name, fields, nfields)
     char            buf[80];
     SV             *error = perl_get_sv ("Wais::errmsg", TRUE);
 
-    sv_setpv (error, sprintf (buf, "Invalid field name '%s'", field_name));
+    sprintf (buf, "Invalid field name '%s'", field_name);
+    sv_setpv (error, buf);
     disposeDatabase (db);
     return (NULL);
   }
@@ -193,7 +200,8 @@ find_word (database_name, field, word, offset, matches)
         if (db) disposeDatabase (db);\
         s_free(index_block_header);\
         s_free (posting_list);\
-        sv_setpv (error, sprintf (buf, M, V));\
+      sprintf (buf, M, V);\
+        sv_setpv (error, buf);\
         return (0);\
 }
 

@@ -6,15 +6,24 @@
 # Author          : Ulrich Pfeifer
 # Created On      : Sun Sep 10 11:00:44 1995
 # Last Modified By: Ulrich Pfeifer
-# Last Modified On: Wed Nov  8 12:15:52 1995
+# Last Modified On: Wed Dec 13 15:36:54 1995
 # Language        : Perl
-# Update Count    : 18
+# Update Count    : 24
 # Status          : Unknown, Use with caution!
 # 
 # (C) Copyright 1995, Universität Dortmund, all rights reserved.
 # 
 # $Locker: pfeifer $
 # $Log: Makefile.PL,v $
+# Revision 2.1  1995/12/13  14:52:20  pfeifer
+# *** empty log message ***
+#
+# Revision 2.0.1.6  1995/12/13  08:29:52  pfeifer
+# patch14: Added -noprototypes.
+#
+# Revision 2.0.1.5  1995/12/08  19:31:03  pfeifer
+# patch12: 2beta1 conformant.
+#
 # Revision 2.0.1.4  1995/11/08  15:12:58  pfeifer
 # patch6: Added TESTDB for tests.
 #
@@ -47,6 +56,11 @@ while (! -d $FW) {
     chomp($FW = <STDIN>);
 }
 
+unless (-e "$FW/FIELD-EXAMPLE/test.doc") {
+    print "Your tests database \"$FW/FIELD-EXAMPLE/test\" is missing\n";
+    print "You must rebuild it before running the tests!\n";
+}
+
 open(CONF, "$FW/config.h") || die "Could not open $FW/config.h: $!";
 $regexp = '';
 while (<CONF>) {
@@ -67,13 +81,14 @@ while (<PATCH>) {
 close(PATCH);
 
 &WriteMakefile(
-	'potential_libs' => "-L$FW/ir -L$FW/regexp -L$FW/lib -lwais $regexp -lftw",
+	'LIBS'           => "-L$FW/ir -L$FW/regexp -L$FW/lib -lwais $regexp -lftw",
 	'INC'            => "-I$FW/ir",
 	'NAME'           => 'Wais',
         'TESTDB'         => "$FW/FIELD-EXAMPLE/test",
 	'VERSION'        => "$version.$revision",
 	'OBJECT'         => "Wais.o HTWAIS.o dictionary.o",
-	'DEFINE'         => '-DTRACE=0',
+	'DEFINE'         => '-DTRACE=0 -g',
+        'XSPROTOARG'     => '-noprototypes', 
         'dist'           => { SUFFIX => 'gz', COMPRESS => 'gzip -f' },
         'clean' 	 => {'FILES' => '*~'},
 );

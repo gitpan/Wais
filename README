@@ -1,19 +1,25 @@
-For installation you need a installed perl5. I used perl5.001m.  Also
-you need the freeWAIS-sf-2.0 distribution with patchlevel >= 46. For
-compilation the source directory of freeWAIS-sf is used.
+For installation you need a installed perl5. I used perl5.002b1f.
+Also you need the freeWAIS-sf-2.0 distribution with patchlevel >=
+46. For compilation the source directory of freeWAIS-sf is used.  For
+the tests the test database in the freeWAIS-sf source directoryis
+used. So recreate it if you cleaned tehere.
 
-Untar the waisperl tarfile outside the perl source tree.  Then, you have to
-edit Makefile.PL and customize it with the name of your freeWAIS-sf
-source directory. (Hopefully, you didn't blow the latter away after
-compiling freeWAIS-sf. :)) 
+Untar the waisperl tarfile outside the perl source tree.  Then, you
+have to edit Makefile.PL and customize it with the name of your
+freeWAIS-sf source directory. (Hopefully, you didn't blow the latter
+away after compiling freeWAIS-sf. :))
 
 Then run 'perl Makefile.PL'. For building a dynamic extension use 
 
-        make; make install
+        make; make test; make install
 
 For building a perl with the wais extensions statically linked use
 
-        make perl
+        make perl; make test_static;
 
+See the documentation of MakeMaker for details. Run
 
+        perldoc ExtUtils::MakeMaker
+
+Ulrich Pfeifer
 

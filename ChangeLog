@@ -1,3 +1,40 @@
+Wed Dec 13 15:57:27 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Wed Dec 13 09:42:07 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+MANIFEST
+	Added typemap.
+Makefile.PL
+	Added -noprototypes.
+Wais.pm
+	Added Retrieve().
+Wais.xs
+	Added CHARS_PER_PAGE.
+
+	Tue Dec 12 12:46:55 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Parallel search works.
+	sprintf fixes.
+
+Fri Dec  8 20:34:18 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+Makefile.PL
+	2beta1 conformant.
+
+	Added plenty of stuff for direct access to the Protokoll.
+	When finished, parallel searching will be possible.
+	Currently only search works. But it can handle relevance-
+	feedback. Document type currently is not availabe.
+        Documenttype "TEXT" is hardcoded for now.
+
 Thu Nov 16 13:25:34 MET 1995   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
 
 . Description:
